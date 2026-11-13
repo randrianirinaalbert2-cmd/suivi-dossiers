@@ -19,14 +19,14 @@ class ReferentielSeeder extends Seeder
         $solde = Division::firstOrCreate(['nom' => 'Solde']);
         $visa = Division::firstOrCreate(['nom' => 'Visa']);
 
-        // Lieux : codes et noms des districts de la région Amoron'i Mania,
-        // plus une entrée générique pour les dossiers venant d'autres ministères.
+        // Lieux : les codes distinguent les localités ; le sigle porté sur
+        // les bordereaux est toujours celui de la direction régionale (236).
         $lieux = [
             ['306', 'Ambositra', '236'],
-            ['304', 'Ambatofinandrahana', '237'],
-            ['323', 'Manandrina', '237'],
-            ['308', 'Fandriana', '238'],
-            ['999', 'Autres Ministères', 'AUM'],
+            ['304', 'Ambatofinandrahana', '236'],
+            ['323', 'Manandrina', '236'],
+            ['308', 'Fandriana', '236'],
+            ['999', 'Autres Ministères', '236'],
         ];
 
         foreach ($lieux as [$code, $nom, $sigle]) {

@@ -428,7 +428,7 @@ class BordereauCreationTest extends TestCase
     /**
      * Prépare un bordereau reçu avec ses dossiers pour la génération du BE.
      */
-    private function bordereauRecuAvecDossiers(TypeDossier $type, Agent $agent, ?string $observation = null): BordereauRecu
+    private function bordereauRecuAvecDossiers(TypeDossier $type, Agent $agent, ?string $observation = null, StatutDossier $statut = StatutDossier::Traite): BordereauRecu
     {
         $service = ServiceOrigine::create(['nom' => 'DSP']);
 
@@ -450,7 +450,7 @@ class BordereauCreationTest extends TestCase
             'agent_id' => $agent->id,
             'type_dossier_id' => $type->id,
             'responsable_id' => $this->utilisateur->id,
-            'statut' => StatutDossier::Recu,
+            'statut' => $statut,
             'pole' => PoleDossier::Solde,
         ]);
 
@@ -500,7 +500,7 @@ class BordereauCreationTest extends TestCase
             'agent_id' => $agentManuel->id,
             'type_dossier_id' => $typeManuel->id,
             'responsable_id' => $this->utilisateur->id,
-            'statut' => StatutDossier::Recu,
+            'statut' => StatutDossier::Traite,
             'pole' => PoleDossier::Solde,
         ]);
 
@@ -523,5 +523,50 @@ class BordereauCreationTest extends TestCase
             ->assertOk()
             ->assertSee('Générer le BE')
             ->assertSee(route('bordereaux.generer-be', $bordereau), false);
+    }
+
+    public function test_generation_du_be_refuse_un_dossier_non_traite(): void
+    {
+        $agent = Agent::create(['im' => '111222', 'nom' => 'RAKOTO', 'prenoms' => 'Jean']);
+        $bordereau = $this->bordereauRecuAvecDossiers($this->typeDossier, $agent, null, StatutDossier::Recu);
+
+        $this->actingAs($this->utilisateur)
+            ->get(route('bordereaux.generer-be', $bordereau))
+            ->assertRedirect(route('bordereaux.show', $bordereau))
+            ->assertSessionHas('erreur');
+    }
+
+    public function test_le_be_ne_reprend_que_les_dossiers_traites(): void
+    {
+        $agentTraite = Agent::create(['im' => '111222', 'nom' => 'RAKOTO', 'prenoms' => 'Jean']);
+        $bordereau = $this->bordereauRecuAvecDossiers($this->typeDossier, $agentTraite);
+
+        $agentNonTraite = Agent::create(['im' => '333444', 'nom' => 'RABE', 'prenoms' => 'Paul']);
+        $bordereau->dossiers()->create([
+            'division_id' => $this->division->id,
+            'agent_id' => $agentNonTraite->id,
+            'type_dossier_id' => $this->typeDossier->id,
+            'responsable_id' => $this->utilisateur->id,
+            'statut' => StatutDossier::EnTraitement,
+            'pole' => PoleDossier::Solde,
+        ]);
+
+        $this->actingAs($this->utilisateur)
+            ->get(route('bordereaux.generer-be', $bordereau))
+            ->assertOk()
+            ->assertSee('111222')
+            ->assertDontSee('333444');
+    }
+
+    public function test_le_bouton_generer_le_be_est_masque_si_aucun_dossier_n_est_traite(): void
+    {
+        $agent = Agent::create(['im' => '111222', 'nom' => 'RAKOTO', 'prenoms' => 'Jean']);
+        $bordereau = $this->bordereauRecuAvecDossiers($this->typeDossier, $agent, null, StatutDossier::Recu);
+
+        $this->actingAs($this->utilisateur)
+            ->get(route('bordereaux.show', $bordereau))
+            ->assertOk()
+            ->assertDontSee('Générer le BE')
+            ->assertDontSee(route('bordereaux.generer-be', $bordereau), false);
     }
 }

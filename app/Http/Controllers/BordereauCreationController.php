@@ -103,6 +103,8 @@ class BordereauCreationController extends Controller
      * reçu : l'en-tête reste à compléter, les agents sont repris des dossiers
      * sauf pour le code « CMVT 03 » (recrutement d'un EFA) dont la ligne est
      * volontairement laissée vide pour une saisie manuelle.
+     *
+     * Seuls les dossiers déjà traités (ou au-delà) peuvent figurer sur le BE.
      */
     public function createDepuisBordereau(Request $request, BordereauRecu $bordereau): View|RedirectResponse
     {
@@ -118,13 +120,14 @@ class BordereauCreationController extends Controller
         $dossiers = $bordereau->dossiers()
             ->with(['agent', 'typeDossier'])
             ->whereHas('typeDossier', fn ($query) => $query->where('division_id', $divisionMatricule->id))
+            ->whereIn('statut', Dossier::statutsPourBordereauEnvoi())
             ->orderBy('id')
             ->get();
 
         if ($dossiers->isEmpty()) {
             return redirect()
                 ->route('bordereaux.show', $bordereau)
-                ->with('erreur', 'Aucun dossier de ce bordereau ne peut figurer sur un bordereau de création.');
+                ->with('erreur', 'Aucun dossier traité de ce bordereau ne peut figurer sur un bordereau d\'envoi (BE). Un dossier doit être au statut « Traité » ou au-delà.');
         }
 
         $lignes = $dossiers->map(function (Dossier $dossier) {

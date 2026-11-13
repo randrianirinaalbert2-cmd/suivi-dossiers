@@ -59,6 +59,21 @@ class Dossier extends ModeleBase
         return ! $this->estAuVisa();
     }
 
+    /**
+     * Statuts à partir desquels un dossier peut figurer sur un bordereau
+     * d'envoi (BE) : le dossier doit être traité, ou au-delà.
+     *
+     * @return list<string>
+     */
+    public static function statutsPourBordereauEnvoi(): array
+    {
+        return [
+            StatutDossier::Traite->value,
+            StatutDossier::Transmis->value,
+            StatutDossier::Archive->value,
+        ];
+    }
+
     public function bordereauRecu(): BelongsTo
     {
         return $this->belongsTo(BordereauRecu::class);

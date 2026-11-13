@@ -13,15 +13,24 @@
                     </svg>
                     Créer un dossier
                 </a>
-                @if (Auth::user()->peutGererBordereauxDeCreation() && $dossiers->contains(fn ($dossier) => $dossier->typeDossier?->division?->chargeLesMatricules()))
+                @php
+                    $peutGererBe = Auth::user()->peutGererBordereauxDeCreation();
+                    $aDesDossiersMatricule = $dossiers->contains(fn ($dossier) => $dossier->typeDossier?->division?->chargeLesMatricules());
+                    // Le BE ne reprend que les dossiers déjà traités (ou au-delà).
+                    $aDesDossiersTraites = $dossiers->contains(fn ($dossier) => $dossier->typeDossier?->division?->chargeLesMatricules()
+                        && in_array($dossier->statut->value, \App\Models\Dossier::statutsPourBordereauEnvoi(), true));
+                @endphp
+                @if ($peutGererBe && $aDesDossiersTraites)
                     <a href="{{ route('bordereaux.generer-be', $bordereau) }}"
-                       title="Reprendre automatiquement les agents de ce bordereau dans un bordereau de création"
+                       title="Reprendre automatiquement les dossiers traités de ce bordereau dans un bordereau d'envoi"
                        class="inline-flex items-center gap-2 rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
                         </svg>
                         Générer le BE
                     </a>
+                @endif
+                @if ($peutGererBe && $aDesDossiersMatricule)
                     <a href="{{ route('bordereaux.soit-transmis', $bordereau) }}" target="_blank"
                        title="Note « Soit transmis » reprenant les dossiers traités de ce bordereau"
                        class="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700">

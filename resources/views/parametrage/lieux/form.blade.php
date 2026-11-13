@@ -24,7 +24,7 @@
                         <div>
                             <x-input-label for="code" value="Code (3 chiffres)" />
                             <x-text-input id="code" name="code" type="text" class="mt-1 block w-full"
-                                          :value="old('code', $lieu->code)" maxlength="3" required autofocus />
+                                          :value="old('code', $lieu->code)" maxlength="30" required autofocus />
                             <x-input-error class="mt-2" :messages="$errors->get('code')" />
                         </div>
                         <div class="sm:col-span-2">

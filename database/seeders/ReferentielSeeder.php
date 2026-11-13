@@ -26,7 +26,7 @@ class ReferentielSeeder extends Seeder
             ['304', 'Ambatofinandrahana', '236'],
             ['323', 'Manandrina', '236'],
             ['308', 'Fandriana', '236'],
-            ['999', 'Autres Ministères', '236'],
+            ['Autre Min', 'Autres Ministères', '236'],
         ];
 
         foreach ($lieux as [$code, $nom, $sigle]) {

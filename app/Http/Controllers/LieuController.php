@@ -27,7 +27,7 @@ class LieuController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $donnees = $request->validate([
-            'code' => ['required', 'string', 'max:3', 'unique:lieux,code'],
+            'code' => ['required', 'string', 'max:30', 'unique:lieux,code'],
             'nom' => ['required', 'string', 'max:100'],
             'sigle' => ['required', 'string', 'max:3'],
         ]);
@@ -45,7 +45,7 @@ class LieuController extends Controller
     public function update(Request $request, Lieu $lieu): RedirectResponse
     {
         $donnees = $request->validate([
-            'code' => ['required', 'string', 'max:3', 'unique:lieux,code,'.$lieu->id],
+            'code' => ['required', 'string', 'max:30', 'unique:lieux,code,'.$lieu->id],
             'nom' => ['required', 'string', 'max:100'],
             'sigle' => ['required', 'string', 'max:3'],
         ]);

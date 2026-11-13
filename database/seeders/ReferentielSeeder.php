@@ -19,15 +19,14 @@ class ReferentielSeeder extends Seeder
         $solde = Division::firstOrCreate(['nom' => 'Solde']);
         $visa = Division::firstOrCreate(['nom' => 'Visa']);
 
-        // Lieux : les codes distinguent les localités ; les localités
-        // d'Amoron'i Mania portent le sigle de la direction régionale (236).
-        // « Autres Ministères » garde un sigle propre pour être identifiable.
+        // Lieux : le code distingue la localité, mais le sigle porté sur les
+        // bordereaux reste toujours celui de la direction régionale (236).
         $lieux = [
             ['306', 'Ambositra', '236'],
             ['304', 'Ambatofinandrahana', '236'],
             ['323', 'Manandrina', '236'],
             ['308', 'Fandriana', '236'],
-            ['999', 'Autres Ministères', 'AUM'],
+            ['999', 'Autres Ministères', '236'],
         ];
 
         foreach ($lieux as [$code, $nom, $sigle]) {

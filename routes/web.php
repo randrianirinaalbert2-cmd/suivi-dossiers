@@ -13,6 +13,7 @@ use App\Http\Controllers\PieceRequiseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceOrigineController;
 use App\Http\Controllers\SoitTransmisVisaController;
+use App\Http\Controllers\StatistiqueController;
 use App\Http\Controllers\TypeDossierController;
 use App\Http\Controllers\TypePieceController;
 use App\Http\Controllers\UtilisateurController;
@@ -28,7 +29,7 @@ Route::get('/', function () {
 // l'administration et aucune boîte de courriel n'est configurée.
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
-    Route::get('statistiques/dossiers', [\App\Http\Controllers\StatistiqueController::class, 'dossiers'])->name('statistiques.dossiers');
+    Route::get('statistiques/dossiers', [StatistiqueController::class, 'dossiers'])->name('statistiques.dossiers');
 
     // Bordereaux reçus (entrées) et dossiers
     Route::resource('bordereaux', BordereauRecuController::class)
@@ -70,6 +71,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['matricule'])->group(function () {
         Route::get('bordereaux/{bordereau}/generer-be', [BordereauCreationController::class, 'createDepuisBordereau'])
             ->name('bordereaux.generer-be');
+        Route::post('bordereaux/{bordereau}/generer-be', [BordereauCreationController::class, 'preparerBeDepuisBordereau'])
+            ->name('bordereaux.preparer-be');
         Route::get('bordereaux/{bordereau}/soit-transmis', [BordereauCreationController::class, 'soitTransmisDepuisBordereau'])
             ->name('bordereaux.soit-transmis');
         Route::resource('bordereaux-creation', BordereauCreationController::class)

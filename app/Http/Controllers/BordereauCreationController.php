@@ -99,12 +99,14 @@ class BordereauCreationController extends Controller
     }
 
     /**
-     * Prépare un bordereau de création à partir des dossiers d'un bordereau
-     * reçu : l'en-tête reste à compléter, les agents sont repris des dossiers
-     * sauf pour le code « CMVT 03 » (recrutement d'un EFA) dont la ligne est
-     * volontairement laissée vide pour une saisie manuelle.
+     * Étape 1 : choisir le chapitre puis les dossiers qui figureront sur le
+     * bordereau d'envoi.
      *
-     * Seuls les dossiers déjà traités (ou au-delà) peuvent figurer sur le BE.
+     * Un bordereau reçu peut contenir des dossiers de chapitres différents :
+     * ils ne peuvent pas être sur le même BE. On sélectionne donc les dossiers
+     * d'un même chapitre ; un autre chapitre donnera un autre BE.
+     *
+     * Seuls les dossiers déjà traités (ou au-delà) sont proposés.
      */
     public function createDepuisBordereau(Request $request, BordereauRecu $bordereau): View|RedirectResponse
     {
@@ -117,12 +119,7 @@ class BordereauCreationController extends Controller
             403
         );
 
-        $dossiers = $bordereau->dossiers()
-            ->with(['agent', 'typeDossier'])
-            ->whereHas('typeDossier', fn ($query) => $query->where('division_id', $divisionMatricule->id))
-            ->whereIn('statut', Dossier::statutsPourBordereauEnvoi())
-            ->orderBy('id')
-            ->get();
+        $dossiers = $this->dossiersPourBe($bordereau, $divisionMatricule->id);
 
         if ($dossiers->isEmpty()) {
             return redirect()
@@ -130,7 +127,105 @@ class BordereauCreationController extends Controller
                 ->with('erreur', 'Aucun dossier traité de ce bordereau ne peut figurer sur un bordereau d\'envoi (BE). Un dossier doit être au statut « Traité » ou au-delà.');
         }
 
-        $lignes = $dossiers->map(function (Dossier $dossier) {
+        return view('bordereaux.generer-be', [
+            'bordereau' => $bordereau,
+            'dossiers' => $dossiers,
+        ]);
+    }
+
+    /**
+     * Étape 2 : prépare le formulaire du BE avec les dossiers sélectionnés.
+     */
+    public function preparerBeDepuisBordereau(Request $request, BordereauRecu $bordereau): View|RedirectResponse
+    {
+        $this->verifierDivision($bordereau->division_id);
+
+        $divisionMatricule = $this->divisionMatricule();
+
+        abort_unless(
+            $divisionMatricule !== null && $request->user()->peutGererBordereauxDeCreation(),
+            403
+        );
+
+        $disponibles = $this->dossiersPourBe($bordereau, $divisionMatricule->id);
+
+        if ($disponibles->isEmpty()) {
+            return redirect()
+                ->route('bordereaux.show', $bordereau)
+                ->with('erreur', 'Aucun dossier traité de ce bordereau ne peut figurer sur un bordereau d\'envoi (BE).');
+        }
+
+        $donnees = $request->validate([
+            'chapitre' => ['required', 'string', 'max:6'],
+            'dossiers' => ['required', 'array', 'min:1'],
+            'dossiers.*' => ['integer', Rule::in($disponibles->pluck('id')->all())],
+        ], [
+            'dossiers.required' => 'Sélectionnez au moins un dossier pour le bordereau d\'envoi.',
+            'dossiers.min' => 'Sélectionnez au moins un dossier pour le bordereau d\'envoi.',
+        ], [
+            'chapitre' => 'chapitre',
+            'dossiers' => 'dossiers à inclure',
+            'dossiers.*' => 'dossier',
+        ]);
+
+        $dossiers = $disponibles
+            ->whereIn('id', collect($donnees['dossiers'])->map(fn ($id) => (int) $id))
+            ->values();
+
+        $dateArrivee = $bordereau->date_arrivee?->format('d/m/Y');
+
+        $bordereauCreation = new BordereauCreation([
+            'division_id' => $divisionMatricule->id,
+            // Le lieu (donc le sigle) vient de la localité du bordereau reçu.
+            'lieu_id' => $bordereau->lieu_id,
+            'chapitre' => $donnees['chapitre'],
+            'annee' => now()->year,
+            'num_ordre' => BordereauCreation::prochainNumero(now()->year),
+            'date_edition' => now()->toDateString(),
+            'observation' => "En ayant l'honneur de vous transmettre pour compétence"
+                ." (bordereau reçu n° {$bordereau->num_arrivee}"
+                .($dateArrivee !== null ? " du {$dateArrivee}" : '').')',
+        ]);
+
+        $bordereauCreation->setRelation('lignes', $this->lignesDepuisDossiers($dossiers));
+
+        return view('bordereaux-creation.form', [
+            'bordereau' => $bordereauCreation,
+            'sourceBordereau' => $bordereau,
+            'chapitreVerrouille' => true,
+            'divisions' => $this->divisionsVisibles(),
+            'lieux' => Lieu::orderBy('code')->get(),
+            'destinations' => Destination::orderBy('nom')->get(),
+            'typesDossiers' => $this->typesDossiersVisibles(),
+        ]);
+    }
+
+    /**
+     * Dossiers d'un bordereau reçu pouvant figurer sur un BE : type rattaché
+     * à la division qui tient la matricule, et statut « Traité » ou au-delà.
+     *
+     * @return Collection<int, Dossier>
+     */
+    protected function dossiersPourBe(BordereauRecu $bordereau, int $divisionId): Collection
+    {
+        return $bordereau->dossiers()
+            ->with(['agent', 'typeDossier'])
+            ->whereHas('typeDossier', fn ($query) => $query->where('division_id', $divisionId))
+            ->whereIn('statut', Dossier::statutsPourBordereauEnvoi())
+            ->orderBy('id')
+            ->get();
+    }
+
+    /**
+     * Lignes de BE reprises des dossiers, sauf le code « CMVT 03 » dont la
+     * ligne reste vide pour une saisie manuelle.
+     *
+     * @param  Collection<int, Dossier>  $dossiers
+     * @return Collection<int, LigneBordereauCreation>
+     */
+    protected function lignesDepuisDossiers(Collection $dossiers): Collection
+    {
+        return $dossiers->map(function (Dossier $dossier) {
             $saisieManuelle = $dossier->typeDossier?->code === self::CODE_SAISIE_MANUELLE;
 
             return new LigneBordereauCreation([
@@ -141,31 +236,6 @@ class BordereauCreationController extends Controller
                 'type_dossier_id' => $dossier->type_dossier_id,
             ]);
         });
-
-        $dateArrivee = $bordereau->date_arrivee?->format('d/m/Y');
-
-        $bordereauCreation = new BordereauCreation([
-            'division_id' => $divisionMatricule->id,
-            // Le lieu (donc le sigle) vient de la localité du bordereau reçu.
-            'lieu_id' => $bordereau->lieu_id,
-            'annee' => now()->year,
-            'num_ordre' => BordereauCreation::prochainNumero(now()->year),
-            'date_edition' => now()->toDateString(),
-            'observation' => "En ayant l'honneur de vous transmettre pour compétence"
-                ." (bordereau reçu n° {$bordereau->num_arrivee}"
-                .($dateArrivee !== null ? " du {$dateArrivee}" : '').')',
-        ]);
-
-        $bordereauCreation->setRelation('lignes', $lignes);
-
-        return view('bordereaux-creation.form', [
-            'bordereau' => $bordereauCreation,
-            'sourceBordereau' => $bordereau,
-            'divisions' => $this->divisionsVisibles(),
-            'lieux' => Lieu::orderBy('code')->get(),
-            'destinations' => Destination::orderBy('nom')->get(),
-            'typesDossiers' => $this->typesDossiersVisibles(),
-        ]);
     }
 
     public function store(Request $request): RedirectResponse

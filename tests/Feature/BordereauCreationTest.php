@@ -461,14 +461,26 @@ class BordereauCreationTest extends TestCase
     {
         $agent = Agent::create(['im' => '111222', 'nom' => 'RAKOTO', 'prenoms' => 'Jean']);
         $bordereau = $this->bordereauRecuAvecDossiers($this->typeDossier, $agent);
+        $dossier = $bordereau->dossiers()->first();
 
         $this->actingAs($this->utilisateur)
             ->get(route('bordereaux.generer-be', $bordereau))
             ->assertOk()
+            ->assertSee('Sélection des dossiers')
+            ->assertSee('111222')
+            ->assertSee('RAKOTO');
+
+        $this->actingAs($this->utilisateur)
+            ->post(route('bordereaux.preparer-be', $bordereau), [
+                'chapitre' => '4200',
+                'dossiers' => [$dossier->id],
+            ])
+            ->assertOk()
             ->assertSee('Lignes reprises du bordereau reçu')
             ->assertSee('111222')
             ->assertSee('RAKOTO')
-            ->assertSee('Jean');
+            ->assertSee('Jean')
+            ->assertSee('Chapitre 4200');
     }
 
     public function test_generation_du_be_laisse_la_ligne_cmvt_03_vide_pour_saisie_manuelle(): void
@@ -504,8 +516,13 @@ class BordereauCreationTest extends TestCase
             'pole' => PoleDossier::Solde,
         ]);
 
+        $dossier = $bordereau->dossiers()->first();
+
         $this->actingAs($this->utilisateur)
-            ->get(route('bordereaux.generer-be', $bordereau))
+            ->post(route('bordereaux.preparer-be', $bordereau), [
+                'chapitre' => '4200',
+                'dossiers' => [$dossier->id],
+            ])
             ->assertOk()
             ->assertSee('Agent à saisir manuellement')
             ->assertSee("Recrutement d'un EFA")
@@ -556,6 +573,30 @@ class BordereauCreationTest extends TestCase
             ->assertOk()
             ->assertSee('111222')
             ->assertDontSee('333444');
+    }
+
+    public function test_la_selection_refuse_un_dossier_non_traite(): void
+    {
+        $agentTraite = Agent::create(['im' => '111222', 'nom' => 'RAKOTO', 'prenoms' => 'Jean']);
+        $bordereau = $this->bordereauRecuAvecDossiers($this->typeDossier, $agentTraite);
+        $dossierTraite = $bordereau->dossiers()->first();
+
+        $agentNonTraite = Agent::create(['im' => '333444', 'nom' => 'RABE', 'prenoms' => 'Paul']);
+        $dossierNonTraite = $bordereau->dossiers()->create([
+            'division_id' => $this->division->id,
+            'agent_id' => $agentNonTraite->id,
+            'type_dossier_id' => $this->typeDossier->id,
+            'responsable_id' => $this->utilisateur->id,
+            'statut' => StatutDossier::EnTraitement,
+            'pole' => PoleDossier::Solde,
+        ]);
+
+        $this->actingAs($this->utilisateur)
+            ->post(route('bordereaux.preparer-be', $bordereau), [
+                'chapitre' => '4200',
+                'dossiers' => [$dossierTraite->id, $dossierNonTraite->id],
+            ])
+            ->assertSessionHasErrors('dossiers.1');
     }
 
     public function test_le_bouton_generer_le_be_est_masque_si_aucun_dossier_n_est_traite(): void

@@ -1,6 +1,7 @@
 @php
     $creation = ! $bordereau->exists;
     $sourceBordereau = $sourceBordereau ?? null;
+    $chapitreVerrouille = $chapitreVerrouille ?? false;
     $typeSaisieManuelleId = $typesDossiers->firstWhere('code', '03')?->id;
     $lignesInitiales = collect(old('lignes', $bordereau->lignes->map(fn ($ligne) => [
         'agent_im' => $ligne->imAgent(),
@@ -32,9 +33,19 @@
                         Lignes reprises du bordereau reçu n° {{ $sourceBordereau->num_arrivee }} — {{ $sourceBordereau->reference }}
                     </p>
                     <p class="mt-1">
-                        {{ $lignesInitiales->count() }} dossier(s) pré-rempli(s). Vérifiez l'en-tête et complétez le lieu d'édition,
-                        le chapitre, le paquet et la destination.
+                        {{ $lignesInitiales->count() }} dossier(s) sélectionné(s). Vérifiez l'en-tête et complétez
+                        @if ($chapitreVerrouille)
+                            le lieu d'édition, le paquet et la destination.
+                        @else
+                            le lieu d'édition, le chapitre, le paquet et la destination.
+                        @endif
                     </p>
+                    @if ($chapitreVerrouille)
+                        <p class="mt-1 font-medium">
+                            Chapitre {{ $bordereau->chapitre }} — les dossiers d'un autre chapitre doivent faire
+                            l'objet d'un autre bordereau d'envoi.
+                        </p>
+                    @endif
                     @if ($typeSaisieManuelleId)
                         <p class="mt-1 font-medium text-amber-800">
                             Les lignes <strong>CMVT 03 — Recrutement d'un EFA</strong> restent vides : saisissez l'IM et l'identité
@@ -91,7 +102,7 @@
                         <div>
                             <x-input-label for="chapitre" value="Chapitre" />
                             <x-text-input id="chapitre" name="chapitre" type="text" class="mt-1 block w-full" maxlength="6"
-                                          :value="old('chapitre', $bordereau->chapitre)" required />
+                                          :value="old('chapitre', $bordereau->chapitre)" :readonly="$chapitreVerrouille" required />
                             <x-input-error class="mt-2" :messages="$errors->get('chapitre')" />
                         </div>
 

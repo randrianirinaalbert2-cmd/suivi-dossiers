@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ReferentielSeeder::class,
             CodesComplementairesSeeder::class,
+            PiecesSoldeOfficiellesSeeder::class,
             VisaSeeder::class,
         ]);
     }

@@ -46,8 +46,8 @@ class PiecesSoldeOfficiellesSeeder extends Seeder
         ],
 
         // II — Modification de situation
-        // « Acte formaté (2), +2 si avec rappel » : le supplément est saisi
-        // pièce par pièce sur le dossier lorsqu'un rappel est demandé.
+        // Le nombre de base de l'acte formaté est 2 ; un dossier marqué
+        // « avec rappel » en exige 4 (voir Dossier::piecesExigees()).
         '10' => [
             ['Acte formaté', 2],
             ['Arrêté d\'intégration', 3],

@@ -147,6 +147,18 @@
                                 @endif
                             </dd>
                         </div>
+                        @if (in_array($dossier->typeDossier?->code, \App\Models\Dossier::CODES_AVEC_RAPPEL, true))
+                            <div>
+                                <dt class="text-xs font-semibold uppercase text-gray-400">Rappel de solde</dt>
+                                <dd class="mt-1 text-gray-900">
+                                    @if ($dossier->avecRappelEffectif())
+                                        Oui <span class="text-gray-500">— acte formaté exigé en 4 exemplaires</span>
+                                    @else
+                                        Non
+                                    @endif
+                                </dd>
+                            </div>
+                        @endif
                         <div>
                             <dt class="text-xs font-semibold uppercase text-gray-400">Créé le</dt>
                             <dd class="mt-1 text-gray-900">{{ $dossier->cree_le?->format('d/m/Y à H:i') }}</dd>

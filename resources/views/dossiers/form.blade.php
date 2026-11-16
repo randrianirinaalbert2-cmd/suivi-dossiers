@@ -6,6 +6,7 @@
     $responsableChoisi = old('responsable_id', $dossier->responsable_id ?? Auth::id());
     $poleChoisi = old('pole', $dossier->pole?->value ?? 'solde');
     $visaChoisi = (bool) old('passe_par_visa', $dossier->passe_par_visa ?? false);
+    $rappelChoisi = (bool) old('avec_rappel', $dossier->avec_rappel ?? false);
     $dateVisaChoisie = old('date_visa', $dossier->date_visa?->format('Y-m-d'));
     $dateActeChoisie = old('date_acte', $dossier->date_acte?->format('Y-m-d'));
     $numVisaChoisi = old('num_visa', $dossier->num_visa);
@@ -33,7 +34,7 @@
     </x-slot>
 
     <div class="py-8"
-         x-data="gestionDossier(@js($bordereauChoisi), @js($typeChoisi), @js($nouvelAgentInitial))">
+         x-data="gestionDossier(@js($bordereauChoisi), @js($typeChoisi), @js($nouvelAgentInitial), @js($typesDossiers->pluck('code', 'id')))">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             @if (collect($bordereaux)->isEmpty())
                 <div class="bg-white shadow-sm sm:rounded-lg p-6 sm:p-8">
@@ -153,6 +154,7 @@
                                     <option value="">— Sélectionner —</option>
                                     @foreach ($typesDossiers as $typeDossier)
                                         <option value="{{ $typeDossier->id }}" data-division="{{ $typeDossier->division_id }}"
+                                                data-code="{{ $typeDossier->code }}"
                                             :disabled="divisionChoisie !== null && {{ $typeDossier->division_id }} !== divisionChoisie"
                                             @selected($typeChoisi == $typeDossier->id)>
                                             {{ $typeDossier->libelleComplet() }}
@@ -190,6 +192,20 @@
                                 <input type="hidden" name="passe_par_visa" value="0">
                                 <input id="passe_par_visa" name="passe_par_visa" type="checkbox" value="1" @checked($visaChoisi) class="h-4 w-4 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-200">
                                 <x-input-label for="passe_par_visa" value="Ce dossier passe par le visa" class="!mb-0" />
+                            </div>
+
+                            <div class="sm:col-span-2 rounded-md bg-gray-50 px-3 py-2" x-show="avecRappelPossible" x-cloak>
+                                <div class="flex items-center gap-3">
+                                    <input type="hidden" name="avec_rappel" value="0">
+                                    <input id="avec_rappel" name="avec_rappel" type="checkbox" value="1" @checked($rappelChoisi)
+                                           x-bind:disabled="! avecRappelPossible"
+                                           class="h-4 w-4 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-200">
+                                    <x-input-label for="avec_rappel" value="Avec rappel (acte formaté en 4 exemplaires)" class="!mb-0" />
+                                </div>
+                                <p class="mt-1 pl-7 text-xs text-gray-400">
+                                    Concerne l'intégration (10) et le renouvellement de contrat (17) :
+                                    deux exemplaires de plus de l'acte formaté.
+                                </p>
                             </div>
 
                             <div>
@@ -246,11 +262,18 @@
     </div>
 
     <script>
-        function gestionDossier(bordereauInitial, typeInitial, nouvelAgentInitial) {
+        function gestionDossier(bordereauInitial, typeInitial, nouvelAgentInitial, codesTypes) {
             return {
                 bordereau: bordereauInitial,
                 type: typeInitial,
                 nouvelAgent: Boolean(nouvelAgentInitial),
+                codesTypes: codesTypes || {},
+                get typeCode() {
+                    return this.type ? (this.codesTypes[this.type] ?? null) : null;
+                },
+                get avecRappelPossible() {
+                    return ['10', '17'].includes(this.typeCode);
+                },
                 get divisionChoisie() {
                     const select = document.getElementById('bordereau_recu_id');
                     const option = select ? select.options[select.selectedIndex] : null;

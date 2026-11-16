@@ -5,11 +5,26 @@ namespace App\Models;
 use App\Enums\PoleDossier;
 use App\Enums\StatutDossier;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Dossier extends ModeleBase
 {
+    /**
+     * Types de dossier dont l'acte formaté passe de 2 à 4 exemplaires
+     * lorsqu'un rappel de solde est demandé (intégration, renouvellement
+     * de contrat).
+     *
+     * @var list<string>
+     */
+    public const CODES_AVEC_RAPPEL = ['10', '17'];
+
+    /**
+     * Libellé de la pièce dont le nombre d'exemplaires dépend du rappel.
+     */
+    public const PIECE_ACTE_FORMATE = 'Acte formaté';
+
     protected $table = 'dossiers';
 
     protected $fillable = [
@@ -22,6 +37,7 @@ class Dossier extends ModeleBase
         'mois_exploitation',
         'pole',
         'passe_par_visa',
+        'avec_rappel',
         'reference_acte',
         'date_acte',
         'num_visa',
@@ -35,6 +51,7 @@ class Dossier extends ModeleBase
             'statut' => StatutDossier::class,
             'pole' => PoleDossier::class,
             'passe_par_visa' => 'boolean',
+            'avec_rappel' => 'boolean',
             'date_visa' => 'date',
             'date_acte' => 'date',
             'cree_le' => 'datetime',
@@ -122,6 +139,45 @@ class Dossier extends ModeleBase
     public function piecesRequises(): Builder
     {
         return PieceRequise::where('type_dossier_id', $this->type_dossier_id);
+    }
+
+    /**
+     * Le rappel ne s'applique qu'aux types prévus par la liste officielle.
+     */
+    public function avecRappelEffectif(): bool
+    {
+        return (bool) $this->avec_rappel
+            && in_array($this->typeDossier?->code, self::CODES_AVEC_RAPPEL, true);
+    }
+
+    /**
+     * Pièces exigées, avec le nombre d'exemplaires ajusté au rappel.
+     *
+     * Un dossier « avec rappel » des types 10 et 17 exige quatre exemplaires
+     * de l'acte formaté au lieu de deux. Le complément n'est pas enregistré
+     * en base : il dépend du dossier et reste recalculé à chaque affichage.
+     *
+     * @return Collection<int, PieceRequise>
+     */
+    public function piecesExigees(): Collection
+    {
+        $pieces = $this->piecesRequises()
+            ->with('typePiece')
+            ->get()
+            ->sortBy(fn (PieceRequise $piece) => $piece->typePiece?->libelle)
+            ->values();
+
+        if (! $this->avecRappelEffectif()) {
+            return $pieces;
+        }
+
+        foreach ($pieces as $piece) {
+            if ($piece->typePiece?->libelle === self::PIECE_ACTE_FORMATE) {
+                $piece->nb_exemplaires += 2;
+            }
+        }
+
+        return $pieces;
     }
 
     /**

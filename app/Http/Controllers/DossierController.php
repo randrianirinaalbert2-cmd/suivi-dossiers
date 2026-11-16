@@ -190,7 +190,7 @@ class DossierController extends Controller
         return view('dossiers.show', [
             'dossier' => $dossier,
             'completude' => $dossier->completude(),
-            'piecesExigees' => $dossier->typeDossier->piecesRequises->sortBy('typePiece.libelle')->values(),
+            'piecesExigees' => $dossier->piecesExigees(),
             'piecesRecues' => $dossier->piecesRecues->keyBy('type_piece_id'),
             'suite' => $this->statutsPermis($request->user(), $dossier),
             'suiteBloquee' => $dossier->statut->suite() !== []
@@ -671,6 +671,7 @@ class DossierController extends Controller
 
         if (! $dossier->estComplet()) {
             $c = $dossier->completude();
+
             return back()->with('erreur', 'Toutes les pièces requises ne sont pas encore reçues ('.$c['recues'].'/'.$c['exigees'].').');
         }
 
@@ -710,6 +711,7 @@ class DossierController extends Controller
             'responsable_id' => ['nullable', 'exists:utilisateurs,id'],
             'pole' => ['nullable', 'in:'.implode(',', PoleDossier::valeurs())],
             'passe_par_visa' => ['nullable', 'boolean'],
+            'avec_rappel' => ['nullable', 'boolean'],
             'reference_acte' => ['nullable', 'string', 'max:60'],
             'date_acte' => ['nullable', 'date'],
             'num_visa' => ['nullable', 'string', 'max:20'],
@@ -728,6 +730,7 @@ class DossierController extends Controller
             'date_acte' => "date de l'acte",
             'num_visa' => 'numéro de visa',
             'reference_acte' => "référence de l'acte",
+            'avec_rappel' => 'rappel',
         ]);
 
         $bordereau = BordereauRecu::find($donnees['bordereau_recu_id']);

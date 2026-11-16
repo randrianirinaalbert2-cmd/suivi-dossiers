@@ -103,10 +103,30 @@ class ReferentielSeeder extends Seeder
                 ['Certificat administratif pour mandatement', 1],
                 ['Bulletin de solde ou avis de crédit', 1],
             ]],
-            ['14', 'Reclassement d\'un fonctionnaire', 'modification_situation', []],
-            ['15', 'Reclassement d\'un EFA ou d\'un ELD', 'modification_situation', []],
-            ['16', 'Majoration de salaire d\'ELD', 'modification_situation', []],
-            ['17', 'Renouvellement de contrat ou de décision d\'engagement', 'modification_situation', []],
+            ['14', 'Reclassement d\'un fonctionnaire', 'modification_situation', [
+                ['Acte formaté', 2],
+                ['Arrêté de reclassement', 3],
+                ['Certificat administratif pour mandatement', 1],
+                ['Bulletin de solde ou avis de crédit', 1],
+            ]],
+            ['15', 'Reclassement d\'un EFA ou d\'un ELD', 'modification_situation', [
+                ['Acte formaté', 2],
+                ['Avenant', 3],
+                ['Certificat administratif pour mandatement', 1],
+                ['Bulletin de solde ou avis de crédit', 1],
+            ]],
+            ['16', 'Majoration de salaire d\'ELD', 'modification_situation', [
+                ['Acte formaté', 2],
+                ['Décision de majoration', 3],
+                ['Certificat administratif pour mandatement', 1],
+                ['Bulletin de solde ou avis de crédit', 1],
+            ]],
+            ['17', 'Renouvellement de contrat ou de décision d\'engagement', 'modification_situation', [
+                ['Acte formaté', 2],
+                ['Contrat de travail', 3],
+                ['Certificat administratif pour mandatement', 1],
+                ['Bulletin de solde ou avis de crédit', 1],
+            ]],
             // Code proposé (acte administratif soumis à visa) — à confirmer par le service.
             ['18', 'Majoration d\'indice (Catégorie VIII)', 'modification_situation', []],
             ['19', 'Indemnité compensatrice de congé non pris', 'modification_situation', [
@@ -163,12 +183,11 @@ class ReferentielSeeder extends Seeder
             ['39', 'Redoublement d\'échelon ou de classe', 'sanctions', []],
 
             // V — Annulation
-            // Décès : chaque pièce est exigée en 3 exemplaires.
+            // Décès : la liste officielle du service n'exige qu'un acte de décès
+            // et un bulletin de solde (un exemplaire de chacun).
             ['40', 'Annulation (décès)', 'annulation', [
-                ['Acte de décès', 3],
-                ['Acte de mariage ou de naissance (enfant)', 3],
-                ['CIN légalisée', 3],
-                ['Bulletin de solde ou avis de crédit', 3],
+                ['Acte de décès', 1],
+                ['Bulletin de solde ou avis de crédit', 1],
             ]],
             ['41', 'Démission', 'annulation', []],
             ['42', 'Annulation (retraite pour limite d\'âge)', 'annulation', [
@@ -195,6 +214,15 @@ class ReferentielSeeder extends Seeder
             ]],
 
             // VI — Régularisation / modification de situation
+            // Code officiel de l'indemnité d'installation de retraite (IIR).
+            ['50', 'Indemnité d\'installation de retraite', 'regularisation', [
+                ['Acte formaté', 2],
+                ['Décision d\'installation', 3],
+                ['Relevé de service', 3],
+                ['Arrêté d\'admission à la retraite', 3],
+                ['Certificat administratif pour mandatement', 1],
+                ['Bulletin de solde ou avis de crédit', 1],
+            ]],
             ['60', 'Allocations familiales', 'regularisation', []],
             ['61', 'Diverses indemnités (annuelles, non permanentes)', 'regularisation', []],
             ['62', 'Diverses retenues (non permanentes)', 'regularisation', []],
@@ -214,8 +242,6 @@ class ReferentielSeeder extends Seeder
             ['75', 'Diverses modifications autres que le grade (matricule, nom, etc.)', 'regularisation', []],
             ['76', 'Déclassement', 'regularisation', []],
             ['77', 'Validation de service (code rubrique 779)', 'regularisation', []],
-            // Code proposé (acte administratif soumis à visa) — à confirmer par le service.
-            ['78', 'Indemnité d\'installation de retraite', 'regularisation', []],
 
             // VII — Exclusion
             ['80', 'Exclusion temporaire', 'exclusion', []],

@@ -302,9 +302,16 @@ class Dossier extends ModeleBase
 
     /**
      * Dernière confirmation de la situation enregistrée dans l'historique.
+     *
+     * Utilise la relation déjà chargée quand elle l'est (fiche et liste),
+     * pour ne pas multiplier les requêtes.
      */
     public function derniereConfirmationSituation(): ?Historique
     {
+        if ($this->relationLoaded('historiques')) {
+            return $this->historiques->firstWhere('type_action', 'situation_confirmee');
+        }
+
         return $this->historiques()
             ->where('type_action', 'situation_confirmee')
             ->first();

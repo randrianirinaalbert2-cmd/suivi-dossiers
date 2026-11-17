@@ -221,6 +221,23 @@ class DossierConfirmationSituationTest extends TestCase
         $this->assertFalse($dossier->fresh()->situationConfirmee());
     }
 
+    public function test_la_liste_signale_les_dossiers_dont_la_situation_reste_a_confirmer(): void
+    {
+        $aConfirmer = $this->dossier('60');
+        $confirme = $this->dossier('17');
+        $this->dossier('02');
+
+        $this->actingAs($this->utilisateur)
+            ->post(route('dossiers.situation', $confirme), ['interruption_contrat_plus_3_mois' => '0']);
+
+        $reponse = $this->actingAs($this->utilisateur)
+            ->get(route('dossiers.index'))
+            ->assertOk();
+
+        // Un seul dossier doit porter le repère : celui du 60 non confirmé.
+        $this->assertSame(1, substr_count($reponse->getContent(), 'Situation à confirmer'));
+    }
+
     public function test_les_types_sans_condition_ne_sont_pas_bloques(): void
     {
         $dossier = $this->dossier('02');

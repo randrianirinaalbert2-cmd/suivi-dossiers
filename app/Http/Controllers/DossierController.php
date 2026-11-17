@@ -454,6 +454,15 @@ class DossierController extends Controller
             });
         }
 
+        // Pour les CMVT à pièces conditionnelles, la situation de l'agent doit
+        // être confirmée avant de commencer le traitement : sans elle, la
+        // liste des pièces exigées n'est pas fiable.
+        if ($dossier->situationAConfirmer()
+            && ! $dossier->situationConfirmee()
+            && ! in_array($nouveau, [StatutDossier::Recu, StatutDossier::Rejete, StatutDossier::Incomplet], true)) {
+            return back()->with('erreur', $this->messageSituationAConfirmer($dossier));
+        }
+
         $ancien = $dossier->statut;
 
         $maj = [
@@ -616,6 +625,16 @@ class DossierController extends Controller
     {
         $this->verifierDivision($dossier->division_id);
 
+        // Tant que la situation de l'agent n'est pas confirmée, la liste des
+        // pièces est provisoire : on n'enregistre aucune réception.
+        if ($dossier->situationAConfirmer() && ! $dossier->situationConfirmee()) {
+            if ($request->wantsJson()) {
+                return response()->json(['message' => $this->messageSituationAConfirmer($dossier)], 422);
+            }
+
+            return back()->with('erreur', $this->messageSituationAConfirmer($dossier));
+        }
+
         $donnees = $request->validate([
             'type_piece_id' => ['required', 'exists:types_pieces,id'],
         ]);
@@ -669,6 +688,10 @@ class DossierController extends Controller
             return back()->with('erreur', 'Cette action n\'est disponible que pour un dossier rejeté ou incomplet.');
         }
 
+        if ($dossier->situationAConfirmer() && ! $dossier->situationConfirmee()) {
+            return back()->with('erreur', $this->messageSituationAConfirmer($dossier));
+        }
+
         if (! $dossier->estComplet()) {
             $c = $dossier->completude();
 
@@ -694,6 +717,83 @@ class DossierController extends Controller
         ]);
 
         return back()->with('succes', 'Dossier validé : toutes les pièces sont reçues. Il peut maintenant être pris en charge.');
+    }
+
+    /**
+     * Confirme la situation de l'agent avant traitement (CMVT 17 et 60).
+     *
+     * C'est cette étape qui fige les pièces exigées : elle enregistre la
+     * situation dans le dossier et laisse une trace nominative dans
+     * l'historique (qui, quand, quelle situation).
+     */
+    public function confirmerSituation(Request $request, Dossier $dossier): RedirectResponse
+    {
+        $this->verifierDivision($dossier->division_id);
+
+        if (! $dossier->situationAConfirmer()) {
+            return back()->with('erreur', 'Ce type de dossier ne demande pas de confirmation de situation.');
+        }
+
+        $regles = [];
+
+        if ($dossier->typeDossier?->code === '17') {
+            $regles['interruption_contrat_plus_3_mois'] = ['nullable', 'boolean'];
+        } else {
+            $regles['nombre_enfants'] = ['required', 'integer', 'min:0', 'max:30'];
+            $regles['situation_familiale'] = ['required', Rule::in(['marie', 'celibataire'])];
+            $regles['enfant_moins_de_4_ans'] = ['nullable', 'boolean'];
+            $regles['enfant_deja_integre'] = ['nullable', 'boolean'];
+        }
+
+        $donnees = $request->validate(
+            $regles,
+            [],
+            [
+                'nombre_enfants' => 'nombre d\'enfants',
+                'situation_familiale' => 'situation familiale',
+            ]
+        );
+
+        if ($dossier->typeDossier?->code === '17') {
+            $dossier->update([
+                'interruption_contrat_plus_3_mois' => $request->boolean('interruption_contrat_plus_3_mois'),
+            ]);
+        } else {
+            $dossier->update([
+                'nombre_enfants' => (int) $donnees['nombre_enfants'],
+                'situation_familiale' => $donnees['situation_familiale'],
+                'enfant_moins_de_4_ans' => $request->boolean('enfant_moins_de_4_ans'),
+                'enfant_deja_integre' => $request->boolean('enfant_deja_integre'),
+            ]);
+        }
+
+        $dossier->refresh();
+
+        // Le texte est volontairement figé : il sert de référence pour vérifier
+        // que la situation n'a pas été modifiée depuis la confirmation.
+        $observation = 'Situation confirmée : '.$dossier->resumeSituation();
+
+        Historique::create([
+            'dossier_id' => $dossier->id,
+            'utilisateur_id' => $request->user()->id,
+            'type_action' => 'situation_confirmee',
+            'ancien_statut' => $dossier->statut->value,
+            'nouveau_statut' => $dossier->statut->value,
+            'observation' => $observation,
+        ]);
+
+        return redirect()
+            ->route('dossiers.show', $dossier)
+            ->with('succes', 'Situation de l\'agent confirmée : la liste des pièces a été mise à jour.');
+    }
+
+    /**
+     * Message affiché tant que la situation de l'agent n'est pas confirmée.
+     */
+    protected function messageSituationAConfirmer(Dossier $dossier): string
+    {
+        return 'Confirmez d\'abord la situation de l\'agent (CMVT '.$dossier->typeDossier?->code
+            .') : la liste des pièces exigées en dépend.';
     }
 
     /**

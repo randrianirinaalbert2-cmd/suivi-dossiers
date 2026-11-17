@@ -70,6 +70,117 @@
              'exigees' => $completude['exigees'],
          ]))">
         <div class="mx-auto sm:px-6 lg:px-8 space-y-6 transition-all duration-200" :class="menuOuvert ? 'max-w-7xl' : 'max-w-full'">
+            @if ($dossier->situationAConfirmer())
+                @php
+                    $situationConfirmee = $dossier->situationConfirmee();
+                    $confirmation = $dossier->derniereConfirmationSituation();
+                    $codeCmvt = $dossier->typeDossier?->code;
+                @endphp
+                <div class="bg-white shadow-sm sm:rounded-lg border-l-4 {{ $situationConfirmee ? 'border-emerald-500' : 'border-amber-500' }}"
+                     x-data="{ modifier: false }">
+                    <div class="p-6">
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                                <h3 class="text-sm font-semibold uppercase tracking-wide {{ $situationConfirmee ? 'text-emerald-700' : 'text-amber-700' }}">
+                                    Situation de l'agent — CMVT {{ $codeCmvt }}
+                                </h3>
+                                @if ($situationConfirmee)
+                                    <p class="mt-1 text-sm font-medium text-gray-900">{{ $dossier->resumeSituation() }}</p>
+                                    <p class="mt-1 text-xs text-gray-400">
+                                        Confirmée le {{ $confirmation->date_heure_action?->format('d/m/Y à H:i') }}
+                                        par {{ $confirmation->utilisateur?->nom }} ({{ $confirmation->utilisateur?->nomRole() }})
+                                    </p>
+                                @else
+                                    <p class="mt-1 text-sm text-amber-800">
+                                        À confirmer avant tout traitement : c'est cette situation qui détermine les pièces exigées.
+                                        Tant qu'elle n'est pas confirmée, la réception des pièces est bloquée.
+                                    </p>
+                                @endif
+                            </div>
+                            @if ($situationConfirmee)
+                                <button type="button" x-on:click="modifier = !modifier"
+                                        class="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50">
+                                    <span x-text="modifier ? 'Annuler' : 'Modifier la situation'">Modifier la situation</span>
+                                </button>
+                            @else
+                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800 ring-1 ring-inset ring-amber-200">
+                                    En attente de confirmation
+                                </span>
+                            @endif
+                        </div>
+
+                        <form method="POST" action="{{ route('dossiers.situation', $dossier) }}"
+                              class="mt-4 space-y-4" x-show="{{ $situationConfirmee ? 'modifier' : 'true' }}" x-cloak>
+                            @csrf
+
+                            @if ($codeCmvt === '17')
+                                <div class="flex items-center gap-3">
+                                    <input type="hidden" name="interruption_contrat_plus_3_mois" value="0">
+                                    <input id="situation_interruption" name="interruption_contrat_plus_3_mois" type="checkbox" value="1"
+                                           @checked(old('interruption_contrat_plus_3_mois', $dossier->interruption_contrat_plus_3_mois))
+                                           class="h-4 w-4 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-200">
+                                    <x-input-label for="situation_interruption"
+                                                   value="Interruption de contrat de plus de 3 mois" class="!mb-0" />
+                                </div>
+                                <p class="pl-7 text-xs text-gray-500">
+                                    Si oui, l'« Attestation de non interruption de service » est exigée.
+                                </p>
+                            @else
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div>
+                                        <x-input-label for="situation_nombre_enfants" value="Nombre d'enfants" />
+                                        <x-text-input id="situation_nombre_enfants" name="nombre_enfants" type="number" min="0" max="30"
+                                                      class="mt-1 block w-full" required
+                                                      :value="old('nombre_enfants', $dossier->nombre_enfants ?? 0)" />
+                                        <x-input-error class="mt-2" :messages="$errors->get('nombre_enfants')" />
+                                    </div>
+                                    <div>
+                                        <x-input-label for="situation_familiale" value="Situation familiale" />
+                                        <select id="situation_familiale" name="situation_familiale" required
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                            <option value="">— Choisir —</option>
+                                            <option value="marie" @selected(old('situation_familiale', $dossier->situation_familiale) === 'marie')>Marié(e)</option>
+                                            <option value="celibataire" @selected(old('situation_familiale', $dossier->situation_familiale) === 'celibataire')>Célibataire</option>
+                                        </select>
+                                        <x-input-error class="mt-2" :messages="$errors->get('situation_familiale')" />
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <input type="hidden" name="enfant_moins_de_4_ans" value="0">
+                                        <input id="situation_enfant_moins_4" name="enfant_moins_de_4_ans" type="checkbox" value="1"
+                                               @checked(old('enfant_moins_de_4_ans', $dossier->enfant_moins_de_4_ans))
+                                               class="h-4 w-4 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-200">
+                                        <x-input-label for="situation_enfant_moins_4" value="Enfant de moins de 4 ans" class="!mb-0" />
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <input type="hidden" name="enfant_deja_integre" value="0">
+                                        <input id="situation_enfant_integre" name="enfant_deja_integre" type="checkbox" value="1"
+                                               @checked(old('enfant_deja_integre', $dossier->enfant_deja_integre))
+                                               class="h-4 w-4 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-200">
+                                        <x-input-label for="situation_enfant_integre" value="Enfant déjà intégré (CNAPS)" class="!mb-0" />
+                                    </div>
+                                </div>
+                                <ul class="list-disc space-y-0.5 pl-5 text-xs text-gray-500">
+                                    <li>Un acte de mariage ou un certificat de célibat est exigé selon la situation.</li>
+                                    <li>La copie des enfants et l'attestation de non paiement dépendent des enfants.</li>
+                                    <li>Un enfant déjà intégré (CNAPS) dispense de l'attestation de non paiement.</li>
+                                </ul>
+                            @endif
+
+                            <div class="flex flex-wrap items-center gap-3">
+                                <button type="submit"
+                                        class="inline-flex items-center gap-2 rounded-lg border-2 border-indigo-500 bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-600/30 transition hover:bg-indigo-700 hover:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+                                    <span x-text="modifier ? 'Enregistrer la modification' : 'Confirmer la situation'">Confirmer la situation</span>
+                                </button>
+                                <p class="text-xs text-gray-400">La confirmation est tracée dans l'historique (nom, rôle, date).</p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 {{-- Fiche du dossier --}}
                 <div class="bg-white shadow-sm sm:rounded-lg p-6 lg:col-span-2">
@@ -284,6 +395,13 @@
                         @endif
                     </div>
 
+                    @if ($dossier->situationAConfirmer() && ! $dossier->situationConfirmee())
+                        <div class="mx-6 mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                            Liste provisoire : confirmez d'abord la situation de l'agent ci-dessus pour figer les pièces
+                            réellement exigées. La réception des pièces est bloquée tant que ce n'est pas fait.
+                        </div>
+                    @endif
+
                     @if ($piecesExigees->isEmpty())
                         <p class="px-6 py-8 text-center text-gray-400">Aucune pièce exigée pour ce type de dossier.</p>
                     @else
@@ -334,6 +452,12 @@
                 {{-- Changement de statut --}}
                 <div class="bg-white shadow-sm sm:rounded-lg p-6">
                     <h3 class="text-sm font-semibold text-gray-800 uppercase tracking-wide">Évolution du statut</h3>
+
+                    @if ($dossier->situationAConfirmer() && ! $dossier->situationConfirmee())
+                        <p class="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                            Le passage en traitement est bloqué tant que la situation de l'agent n'est pas confirmée.
+                        </p>
+                    @endif
 
                     @if (! empty($suite))
                         <form method="POST" action="{{ route('dossiers.statut', $dossier) }}" class="mt-4 space-y-4">

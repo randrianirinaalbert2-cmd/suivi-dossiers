@@ -180,11 +180,16 @@ class DossierPiecesConditionnellesTest extends TestCase
 
     public function test_une_piece_conditionnelle_non_applicable_ne_peut_pas_etre_cochee(): void
     {
-        $dossier = $this->dossier('17');
+        $dossier = $this->dossier('17', ['interruption_contrat_plus_3_mois' => false]);
         $piece = TypePiece::where('libelle', 'Attestation de non interruption de service')->firstOrFail();
 
+        // La situation doit d'abord être confirmée : sans quoi la liste des
+        // pièces reste provisoire et la réception est bloquée.
         $this->actingAs($this->utilisateur)
-            ->post(route('dossiers.pieces', $dossier), ['type_piece_id' => $piece->id])
+            ->post(route('dossiers.situation', $dossier), ['interruption_contrat_plus_3_mois' => '0']);
+
+        $this->actingAs($this->utilisateur)
+            ->postJson(route('dossiers.pieces', $dossier), ['type_piece_id' => $piece->id])
             ->assertStatus(422);
     }
 

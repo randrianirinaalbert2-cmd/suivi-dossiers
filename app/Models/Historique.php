@@ -55,6 +55,7 @@ class Historique extends Model
             'visa' => 'Contrôle et visa du dossier',
             'prise_en_charge' => 'Prise en charge du dossier',
             'attribution_responsable' => 'Attribution / prise du dossier',
+            'situation_confirmee' => 'Situation de l\'agent confirmée',
             default => ucfirst(str_replace('_', ' ', $this->type_action)),
         };
     }

@@ -49,6 +49,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('dossiers/{dossier}/pieces', [DossierController::class, 'basculerPiece'])
         ->name('dossiers.pieces');
 
+    Route::post('dossiers/{dossier}/situation', [DossierController::class, 'confirmerSituation'])
+        ->name('dossiers.situation');
+
     Route::post('dossiers/{dossier}/transmettre-solde', [DossierController::class, 'transmettreAuSolde'])
         ->name('dossiers.transmettre-solde');
 

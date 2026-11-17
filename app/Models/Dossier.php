@@ -26,6 +26,17 @@ class Dossier extends ModeleBase
     public const PIECE_ACTE_FORMATE = 'Acte formaté';
 
     /**
+     * Types dont la situation de l'agent détermine les pièces exigées.
+     *
+     * Pour ces CMVT, la situation doit être confirmée avant tout traitement :
+     * c'est elle qui décide quelles pièces sont réellement demandées (17 :
+     * interruption de service ; 60 : enfants, mariage ou célibat, CNAPS).
+     *
+     * @var list<string>
+     */
+    public const CODES_SITUATION_A_CONFIRMER = ['17', '60'];
+
+    /**
      * Conditions de dossier pouvant rendre une pièce exigible.
      *
      * La clé est enregistrée dans pieces_requises.condition (ou
@@ -279,5 +290,69 @@ class Dossier extends ModeleBase
     public function estComplet(): bool
     {
         return $this->completude()['manquantes'] === 0;
+    }
+
+    /**
+     * La situation de l'agent doit-elle être confirmée pour ce dossier ?
+     */
+    public function situationAConfirmer(): bool
+    {
+        return in_array($this->typeDossier?->code, self::CODES_SITUATION_A_CONFIRMER, true);
+    }
+
+    /**
+     * Dernière confirmation de la situation enregistrée dans l'historique.
+     */
+    public function derniereConfirmationSituation(): ?Historique
+    {
+        return $this->historiques()
+            ->where('type_action', 'situation_confirmee')
+            ->first();
+    }
+
+    /**
+     * La situation de l'agent a-t-elle déjà été confirmée ?
+     *
+     * Tant qu'elle ne l'est pas, la liste des pièces reste provisoire : les
+     * conditions sont évaluées sur des valeurs par défaut. La confirmation
+     * n'est valable que pour la situation effectivement enregistrée : si le
+     * dossier est modifié ensuite, elle doit être refaite.
+     */
+    public function situationConfirmee(): bool
+    {
+        $confirmation = $this->derniereConfirmationSituation();
+
+        return $confirmation !== null
+            && $confirmation->observation === 'Situation confirmée : '.$this->resumeSituation();
+    }
+
+    /**
+     * Résumé lisible de la situation, pour l'écran et l'historique.
+     */
+    public function resumeSituation(): string
+    {
+        if ($this->typeDossier?->code === '17') {
+            return $this->interruption_contrat_plus_3_mois
+                ? 'Interruption de contrat de plus de 3 mois : oui'
+                : 'Interruption de contrat de plus de 3 mois : non';
+        }
+
+        $situation = match ($this->situation_familiale) {
+            'marie' => 'Marié(e)',
+            'celibataire' => 'Célibataire',
+            default => 'Situation familiale non renseignée',
+        };
+
+        $details = [$situation, (int) $this->nombre_enfants.' enfant(s)'];
+
+        if ($this->enfant_moins_de_4_ans) {
+            $details[] = 'dont un de moins de 4 ans';
+        }
+
+        $details[] = $this->enfant_deja_integre
+            ? 'enfant déjà intégré (CNAPS)'
+            : 'aucun enfant intégré (CNAPS)';
+
+        return implode(' · ', $details);
     }
 }

@@ -41,12 +41,7 @@ class DossierController extends Controller
         }
 
         $dossiers = $this->appliquerPortee(Dossier::query())
-            ->with([
-                'agent', 'typeDossier', 'division', 'responsable', 'bordereauRecu',
-                // Seules les confirmations de situation sont utiles dans la
-                // liste : le repère « Situation à confirmer » en dépend.
-                'historiques' => fn ($query) => $query->where('type_action', 'situation_confirmee'),
-            ])
+            ->with(['agent', 'typeDossier', 'division', 'responsable', 'bordereauRecu'])
             ->when($filtres['q'] ?? '', function ($query, $recherche) {
                 $recherche = trim((string) $recherche);
                 $query->where(function ($sous) use ($recherche) {

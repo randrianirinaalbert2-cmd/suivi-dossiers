@@ -178,12 +178,6 @@
                                             @if ($enRetardDossier)
                                                 <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800 ring-1 ring-inset ring-amber-200" title="Délai dépassé">En retard</span>
                                             @endif
-                                            @if ($dossier->situationAConfirmer() && ! $dossier->situationConfirmee())
-                                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800 ring-1 ring-inset ring-amber-300"
-                                                      title="La situation de l'agent doit être confirmée avant traitement">
-                                                    Situation à confirmer
-                                                </span>
-                                            @endif
                                         </div>
                                     </td>
                                     <td class="px-6 py-3 text-gray-500">{{ $dossier->cree_le?->format('d/m/Y') }}</td>

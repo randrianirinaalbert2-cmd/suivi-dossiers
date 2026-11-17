@@ -53,23 +53,19 @@
                                 this.objet = defaut;
                             },
                          }">
-                        <div x-data="{ serviceChoisi: @js((string) old('service_origine_id', $bordereau->service_origine_id)) }">
-                            <x-input-label for="service_origine_id" value="Service d'origine" />
-                            <select id="service_origine_id" name="service_origine_id" x-model="serviceChoisi" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                <option value="">— Sélectionner —</option>
-                                @foreach ($services as $service)
-                                    <option value="{{ $service->id }}">{{ $service->nom }}</option>
-                                @endforeach
-                                <option value="__autre__">Autre (nouveau service)…</option>
-                            </select>
-                            <div x-show="serviceChoisi === '__autre__'" x-cloak class="mt-2">
-                                <x-text-input id="nouveau_service_origine" name="nouveau_service_origine" type="text"
-                                              class="mt-1 block w-full"
-                                              placeholder="Nom du nouveau service d'origine"
-                                              :value="old('nouveau_service_origine')" />
-                                <p class="mt-1 text-xs text-gray-400">Ce service sera enregistré et réutilisable pour les prochaines saisies.</p>
-                            </div>
+                        <div>
+                            <x-input-label for="service_origine_id_recherche" value="Service d'origine" />
+                            <x-service-combobox name="service_origine_id" :services="$services"
+                                                :value="old('service_origine_id', $bordereau->service_origine_id)"
+                                                allow-autre>
+                                <div :class="choisi === '__autre__' ? '' : 'hidden'" x-cloak class="mt-2">
+                                    <x-text-input id="nouveau_service_origine" name="nouveau_service_origine" type="text"
+                                                  class="mt-1 block w-full"
+                                                  placeholder="Nom du nouveau service d'origine"
+                                                  :value="old('nouveau_service_origine')" />
+                                    <p class="mt-1 text-xs text-gray-400">Ce service sera enregistré et réutilisable pour les prochaines saisies.</p>
+                                </div>
+                            </x-service-combobox>
                             <x-input-error class="mt-2" :messages="$errors->get('service_origine_id')" />
                             <x-input-error class="mt-2" :messages="$errors->get('nouveau_service_origine')" />
                         </div>

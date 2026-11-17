@@ -24,14 +24,10 @@
                     <x-text-input id="q" name="q" type="search" class="mt-1 block w-full" :value="$filtres['q'] ?? ''" />
                 </div>
                 <div>
-                    <x-input-label for="service_origine_id" value="Service d'origine" />
-                    <select id="service_origine_id" name="service_origine_id"
-                            class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
-                        <option value="">Tous</option>
-                        @foreach ($services as $service)
-                            <option value="{{ $service->id }}" @selected(($filtres['service_origine_id'] ?? null) == $service->id)>{{ $service->nom }}</option>
-                        @endforeach
-                    </select>
+                    <x-input-label for="service_origine_id_recherche" value="Service d'origine" />
+                    <x-service-combobox name="service_origine_id" :services="$services"
+                                        :value="$filtres['service_origine_id'] ?? null"
+                                        empty-label="Tous" autosubmit />
                 </div>
                 <div>
                     <x-input-label for="division_id" value="Division" />

@@ -50,7 +50,22 @@
                     <tbody class="divide-y divide-gray-100">
                         @forelse ($typeDossier->piecesRequises as $piece)
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-3 font-medium text-gray-900">{{ $piece->typePiece?->libelle }}</td>
+                                <td class="px-6 py-3 font-medium text-gray-900">
+                                    {{ $piece->typePiece?->libelle }}
+                                    @if ($piece->note)
+                                        <span class="mt-0.5 block text-xs font-normal text-gray-400">{{ $piece->note }}</span>
+                                    @endif
+                                    @if ($piece->condition)
+                                        <span class="mt-0.5 block text-xs font-normal text-indigo-500">
+                                            Exigée si : {{ \App\Models\Dossier::libelleCondition($piece->condition) }}
+                                        </span>
+                                    @endif
+                                    @if ($piece->condition_exemplaires)
+                                        <span class="mt-0.5 block text-xs font-normal text-indigo-500">
+                                            {{ $piece->nb_exemplaires_condition }} ex. si {{ \App\Models\Dossier::libelleCondition($piece->condition_exemplaires) }}
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-3">
                                     <form method="POST" action="{{ route('pieces-requises.update', $piece) }}" class="flex items-center gap-2">
                                         @csrf

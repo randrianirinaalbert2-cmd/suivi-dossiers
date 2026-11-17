@@ -159,6 +159,45 @@
                                 </dd>
                             </div>
                         @endif
+                        @if ($dossier->typeDossier?->code === '17')
+                            <div>
+                                <dt class="text-xs font-semibold uppercase text-gray-400">Interruption de contrat</dt>
+                                <dd class="mt-1 text-gray-900">
+                                    @if ($dossier->interruption_contrat_plus_3_mois)
+                                        Plus de 3 mois <span class="text-gray-500">— attestation de non interruption exigée</span>
+                                    @else
+                                        Non (ou 3 mois au plus)
+                                    @endif
+                                </dd>
+                            </div>
+                        @endif
+                        @if ($dossier->typeDossier?->code === '60')
+                            <div>
+                                <dt class="text-xs font-semibold uppercase text-gray-400">Enfants</dt>
+                                <dd class="mt-1 text-gray-900">
+                                    {{ (int) $dossier->nombre_enfants }} enfant(s)
+                                    @if ($dossier->enfant_moins_de_4_ans)
+                                        <span class="text-gray-500">— dont un de moins de 4 ans</span>
+                                    @endif
+                                </dd>
+                            </div>
+                            <div>
+                                <dt class="text-xs font-semibold uppercase text-gray-400">Situation familiale</dt>
+                                <dd class="mt-1 text-gray-900">
+                                    {{ match ($dossier->situation_familiale) {
+                                        'marie' => 'Marié(e)',
+                                        'celibataire' => 'Célibataire',
+                                        default => 'Non renseignée',
+                                    } }}
+                                </dd>
+                            </div>
+                            <div>
+                                <dt class="text-xs font-semibold uppercase text-gray-400">Enfant déjà intégré (CNAPS)</dt>
+                                <dd class="mt-1 text-gray-900">
+                                    {{ $dossier->enfant_deja_integre ? 'Oui — attestation de non paiement non exigée' : 'Non' }}
+                                </dd>
+                            </div>
+                        @endif
                         <div>
                             <dt class="text-xs font-semibold uppercase text-gray-400">Créé le</dt>
                             <dd class="mt-1 text-gray-900">{{ $dossier->cree_le?->format('d/m/Y à H:i') }}</dd>
@@ -272,6 +311,14 @@
                                         </td>
                                         <td class="px-6 py-3">
                                             <span data-piece-libelle class="{{ $recue ? 'text-gray-900 font-medium' : 'text-gray-600' }}">{{ $piece->typePiece?->libelle }}</span>
+                                            @if ($piece->note)
+                                                <span class="mt-0.5 block text-xs text-gray-400">{{ $piece->note }}</span>
+                                            @endif
+                                            @if ($piece->condition)
+                                                <span class="mt-0.5 block text-xs text-indigo-500">
+                                                    Exigée si : {{ \App\Models\Dossier::libelleCondition($piece->condition) }}
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="px-6 py-3 text-gray-500">{{ $piece->nb_exemplaires }} ex.</td>
                                     </tr>

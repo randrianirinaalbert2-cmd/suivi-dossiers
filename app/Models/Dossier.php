@@ -25,6 +25,24 @@ class Dossier extends ModeleBase
      */
     public const PIECE_ACTE_FORMATE = 'Acte formaté';
 
+    /**
+     * Conditions de dossier pouvant rendre une pièce exigible.
+     *
+     * La clé est enregistrée dans pieces_requises.condition (ou
+     * pieces_requises.condition_exemplaires) ; le libellé sert à expliquer
+     * la règle au guichet.
+     *
+     * @var array<string, string>
+     */
+    public const CONDITIONS = [
+        'interruption_contrat_plus_3_mois' => 'interruption de contrat de plus de 3 mois',
+        'a_des_enfants' => 'agent ayant au moins un enfant',
+        'enfant_moins_de_4_ans' => 'enfant de moins de 4 ans',
+        'marie' => 'agent marié(e)',
+        'celibataire' => 'agent célibataire',
+        'enfant_non_integre' => 'enfant pas encore intégré (CNAPS)',
+    ];
+
     protected $table = 'dossiers';
 
     protected $fillable = [
@@ -38,6 +56,11 @@ class Dossier extends ModeleBase
         'pole',
         'passe_par_visa',
         'avec_rappel',
+        'nombre_enfants',
+        'enfant_moins_de_4_ans',
+        'situation_familiale',
+        'interruption_contrat_plus_3_mois',
+        'enfant_deja_integre',
         'reference_acte',
         'date_acte',
         'num_visa',
@@ -52,6 +75,10 @@ class Dossier extends ModeleBase
             'pole' => PoleDossier::class,
             'passe_par_visa' => 'boolean',
             'avec_rappel' => 'boolean',
+            'nombre_enfants' => 'integer',
+            'enfant_moins_de_4_ans' => 'boolean',
+            'interruption_contrat_plus_3_mois' => 'boolean',
+            'enfant_deja_integre' => 'boolean',
             'date_visa' => 'date',
             'date_acte' => 'date',
             'cree_le' => 'datetime',
@@ -151,11 +178,45 @@ class Dossier extends ModeleBase
     }
 
     /**
-     * Pièces exigées, avec le nombre d'exemplaires ajusté au rappel.
+     * La situation du dossier remplit-elle la condition donnée ?
      *
-     * Un dossier « avec rappel » des types 10 et 17 exige quatre exemplaires
-     * de l'acte formaté au lieu de deux. Le complément n'est pas enregistré
-     * en base : il dépend du dossier et reste recalculé à chaque affichage.
+     * Une condition inconnue est considérée comme remplie : une pièce ne
+     * disparaît jamais par accident d'un dossier à cause d'une faute de
+     * frappe dans le paramétrage.
+     */
+    public function conditionRemplie(string $condition): bool
+    {
+        return match ($condition) {
+            'interruption_contrat_plus_3_mois' => (bool) $this->interruption_contrat_plus_3_mois,
+            'a_des_enfants' => (int) $this->nombre_enfants > 0,
+            'enfant_moins_de_4_ans' => (int) $this->nombre_enfants > 0 && (bool) $this->enfant_moins_de_4_ans,
+            'marie' => $this->situation_familiale === 'marie',
+            'celibataire' => $this->situation_familiale === 'celibataire',
+            'enfant_non_integre' => ! (bool) $this->enfant_deja_integre,
+            default => true,
+        };
+    }
+
+    public static function libelleCondition(?string $condition): ?string
+    {
+        if ($condition === null) {
+            return null;
+        }
+
+        return self::CONDITIONS[$condition] ?? $condition;
+    }
+
+    /**
+     * Pièces exigées pour ce dossier, conditions et rappel compris.
+     *
+     * Les pièces conditionnelles ne sont retenues que si la situation du
+     * dossier remplit leur condition. Le nombre d'exemplaires peut être
+     * remplacé lorsqu'une condition de quantité est vraie (acte formaté à
+     * quatre exemplaires pour un enfant de moins de 4 ans). Le rappel des
+     * types 10 et 17 ajoute enfin deux exemplaires de l'acte formaté.
+     *
+     * Rien de tout cela n'est enregistré en base : le résultat dépend du
+     * dossier et reste recalculé à chaque affichage.
      *
      * @return Collection<int, PieceRequise>
      */
@@ -164,8 +225,18 @@ class Dossier extends ModeleBase
         $pieces = $this->piecesRequises()
             ->with('typePiece')
             ->get()
+            ->filter(fn (PieceRequise $piece) => $piece->condition === null
+                || $this->conditionRemplie($piece->condition))
             ->sortBy(fn (PieceRequise $piece) => $piece->typePiece?->libelle)
             ->values();
+
+        foreach ($pieces as $piece) {
+            if ($piece->condition_exemplaires !== null
+                && $piece->nb_exemplaires_condition !== null
+                && $this->conditionRemplie($piece->condition_exemplaires)) {
+                $piece->nb_exemplaires = $piece->nb_exemplaires_condition;
+            }
+        }
 
         if (! $this->avecRappelEffectif()) {
             return $pieces;
@@ -181,14 +252,21 @@ class Dossier extends ModeleBase
     }
 
     /**
-     * Avancement du dossier : pièces reçues / pièces exigées.
+     * Avancement du dossier : pièces reçues / pièces réellement exigées.
+     *
+     * Seules les pièces applicables au dossier sont comptées : une pièce
+     * conditionnelle dont la condition n'est pas remplie ne doit ni peser
+     * sur le taux, ni bloquer la validation.
      *
      * @return array{recues: int, exigees: int, manquantes: int, taux: float}
      */
     public function completude(): array
     {
-        $exigees = $this->piecesRequises()->count();
-        $recues = $this->piecesRecues()->whereIn('type_piece_id', $this->piecesRequises()->pluck('type_piece_id'))->count();
+        $pieces = $this->piecesExigees();
+        $exigees = $pieces->count();
+        $recues = $this->piecesRecues()
+            ->whereIn('type_piece_id', $pieces->pluck('type_piece_id'))
+            ->count();
 
         return [
             'recues' => $recues,

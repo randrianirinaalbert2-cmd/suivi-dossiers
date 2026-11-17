@@ -8,12 +8,21 @@ class PieceRequise extends ModeleBase
 {
     protected $table = 'pieces_requises';
 
-    protected $fillable = ['type_dossier_id', 'type_piece_id', 'nb_exemplaires'];
+    protected $fillable = [
+        'type_dossier_id',
+        'type_piece_id',
+        'nb_exemplaires',
+        'condition',
+        'nb_exemplaires_condition',
+        'condition_exemplaires',
+        'note',
+    ];
 
     protected function casts(): array
     {
         return [
             'nb_exemplaires' => 'integer',
+            'nb_exemplaires_condition' => 'integer',
             'cree_le' => 'datetime',
             'modifie_le' => 'datetime',
         ];

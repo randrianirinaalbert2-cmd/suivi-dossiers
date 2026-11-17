@@ -11,10 +11,11 @@ use Illuminate\Support\Facades\DB;
  * Cette liste remplace intégralement les pièces des types de dossiers Solde
  * qu'elle décrit : toute pièce absente de la liste officielle est retirée,
  * les quantités sont réappliquées et l'ordre de saisie suit le document du
- * service. Les autres codes (01, 06 à 09, 21 à 27, 31 à 39, 41, 43 à 47,
- * 60 à 85) ne sont pas touchés : leur liste n'est pas encore connue.
+ * service. Les autres codes (01, 06 à 09, 18, 21 à 27, 31 à 39, 41, 43 à 47,
+ * 61 à 85) ne sont pas touchés : leur liste n'est pas encore connue.
  *
- * Le nombre entre parenthèses est le nombre d'exemplaires exigés.
+ * Le nombre entre parenthèses est le nombre d'exemplaires exigés. Les pièces
+ * conditionnelles (17 et 60) sont décrites dans la constante CONDITIONS.
  */
 class PiecesSoldeOfficiellesSeeder extends Seeder
 {
@@ -95,6 +96,8 @@ class PiecesSoldeOfficiellesSeeder extends Seeder
             ['Contrat de travail', 3],
             ['Certificat administratif pour mandatement', 1],
             ['Bulletin de solde ou avis de crédit', 1],
+            // Exigée seulement si le contrat a été interrompu plus de 3 mois.
+            ['Attestation de non interruption de service', 1],
         ],
         '19' => [
             ['Acte formaté', 2],
@@ -165,6 +168,61 @@ class PiecesSoldeOfficiellesSeeder extends Seeder
             ['Certificat administratif pour mandatement', 1],
             ['Bulletin de solde ou avis de crédit', 1],
         ],
+
+        // VII — Allocations familiales
+        // Liste fournie par le service : les pièces liées aux enfants et à la
+        // situation familiale sont conditionnelles (voir CONDITIONS).
+        '60' => [
+            ['Acte formaté', 2],
+            ['Copie de tous les enfants', 3],
+            ['Acte de mariage', 3],
+            ['Certificat de célibat', 3],
+            ['Avis de crédit', 1],
+            ['Attestation de non paiement', 3],
+            ['Charge des familles (CF)', 3],
+            ['Certificat administratif', 1],
+        ],
+    ];
+
+    /**
+     * Conditions attachées aux pièces de certains types.
+     *
+     * - condition : la pièce n'est exigée que si la situation est vraie ;
+     * - condition_exemplaires / nb_exemplaires_condition : le nombre
+     *   d'exemplaires est remplacé lorsque la condition est vraie ;
+     * - note : précision affichée au guichet.
+     *
+     * @var array<string, array<string, array{condition?: string, condition_exemplaires?: string, nb_exemplaires_condition?: int, note?: string}>>
+     */
+    private const CONDITIONS = [
+        '17' => [
+            'Attestation de non interruption de service' => [
+                'condition' => 'interruption_contrat_plus_3_mois',
+            ],
+        ],
+        '60' => [
+            'Acte formaté' => [
+                'condition_exemplaires' => 'enfant_moins_de_4_ans',
+                'nb_exemplaires_condition' => 4,
+            ],
+            'Copie de tous les enfants' => [
+                'condition' => 'a_des_enfants',
+            ],
+            'Acte de mariage' => [
+                'condition' => 'marie',
+            ],
+            'Certificat de célibat' => [
+                'condition' => 'celibataire',
+            ],
+            'Avis de crédit' => [
+                'note' => 'Quantité selon les pièces déposées par l\'agent',
+            ],
+            'Attestation de non paiement' => [
+                'condition' => 'enfant_non_integre',
+                'note' => '2 originaux + 1 photocopie',
+            ],
+            'Charge des familles (CF)' => [],
+        ],
     ];
 
     public function run(): void
@@ -191,10 +249,16 @@ class PiecesSoldeOfficiellesSeeder extends Seeder
 
                 $maintenant = now();
                 foreach ($pieces as [$libelle, $nombre]) {
+                    $conditions = self::CONDITIONS[$code][$libelle] ?? [];
+
                     DB::table('pieces_requises')->insert([
                         'type_dossier_id' => $typeDossierId,
                         'type_piece_id' => $this->pieceId($libelle),
                         'nb_exemplaires' => $nombre,
+                        'condition' => $conditions['condition'] ?? null,
+                        'nb_exemplaires_condition' => $conditions['nb_exemplaires_condition'] ?? null,
+                        'condition_exemplaires' => $conditions['condition_exemplaires'] ?? null,
+                        'note' => $conditions['note'] ?? null,
                         'cree_le' => $maintenant,
                         'modifie_le' => $maintenant,
                     ]);

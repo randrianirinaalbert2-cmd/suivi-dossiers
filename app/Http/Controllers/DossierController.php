@@ -620,8 +620,8 @@ class DossierController extends Controller
             'type_piece_id' => ['required', 'exists:types_pieces,id'],
         ]);
 
-        $exigee = $dossier->piecesRequises()->where('type_piece_id', $donnees['type_piece_id'])->exists();
-        abort_unless($exigee, 422, 'Cette pièce n\'est pas exigée pour ce type de dossier.');
+        $pieceExigee = $dossier->piecesExigees()->firstWhere('type_piece_id', (int) $donnees['type_piece_id']);
+        abort_if($pieceExigee === null, 422, 'Cette pièce n\'est pas exigée pour ce dossier.');
 
         $existante = $dossier->piecesRecues()->where('type_piece_id', $donnees['type_piece_id'])->first();
 
@@ -635,7 +635,7 @@ class DossierController extends Controller
             $message = 'La pièce a été réceptionnée.';
         }
 
-        $typePiece = $dossier->piecesRequises()->with('typePiece')->where('type_piece_id', $donnees['type_piece_id'])->first()->typePiece;
+        $typePiece = $pieceExigee->typePiece;
 
         Historique::create([
             'dossier_id' => $dossier->id,
@@ -712,6 +712,11 @@ class DossierController extends Controller
             'pole' => ['nullable', 'in:'.implode(',', PoleDossier::valeurs())],
             'passe_par_visa' => ['nullable', 'boolean'],
             'avec_rappel' => ['nullable', 'boolean'],
+            'nombre_enfants' => ['nullable', 'integer', 'min:0', 'max:30'],
+            'enfant_moins_de_4_ans' => ['nullable', 'boolean'],
+            'situation_familiale' => ['nullable', Rule::in(['marie', 'celibataire'])],
+            'interruption_contrat_plus_3_mois' => ['nullable', 'boolean'],
+            'enfant_deja_integre' => ['nullable', 'boolean'],
             'reference_acte' => ['nullable', 'string', 'max:60'],
             'date_acte' => ['nullable', 'date'],
             'num_visa' => ['nullable', 'string', 'max:20'],
@@ -731,6 +736,11 @@ class DossierController extends Controller
             'num_visa' => 'numéro de visa',
             'reference_acte' => "référence de l'acte",
             'avec_rappel' => 'rappel',
+            'nombre_enfants' => 'nombre d\'enfants',
+            'situation_familiale' => 'situation familiale',
+            'enfant_moins_de_4_ans' => 'enfant de moins de 4 ans',
+            'interruption_contrat_plus_3_mois' => 'interruption de contrat de plus de 3 mois',
+            'enfant_deja_integre' => 'enfant déjà intégré',
         ]);
 
         $bordereau = BordereauRecu::find($donnees['bordereau_recu_id']);
@@ -750,6 +760,11 @@ class DossierController extends Controller
         $donnees['pole'] = $donnees['pole'] ?? $this->poleDeLaDivision($bordereau->division_id)->value;
         $donnees['passe_par_visa'] = $request->boolean('passe_par_visa')
             || $donnees['pole'] === PoleDossier::Visa->value;
+        $donnees['nombre_enfants'] = (int) ($donnees['nombre_enfants'] ?? 0);
+        $donnees['enfant_moins_de_4_ans'] = $request->boolean('enfant_moins_de_4_ans');
+        $donnees['situation_familiale'] = $donnees['situation_familiale'] ?? null;
+        $donnees['interruption_contrat_plus_3_mois'] = $request->boolean('interruption_contrat_plus_3_mois');
+        $donnees['enfant_deja_integre'] = $request->boolean('enfant_deja_integre');
         $donnees['date_visa'] = $donnees['date_visa'] ?? null;
         $donnees['date_acte'] = $donnees['date_acte'] ?? null;
         $donnees['num_visa'] = $donnees['num_visa'] ?? null;

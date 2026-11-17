@@ -7,6 +7,11 @@
     $poleChoisi = old('pole', $dossier->pole?->value ?? 'solde');
     $visaChoisi = (bool) old('passe_par_visa', $dossier->passe_par_visa ?? false);
     $rappelChoisi = (bool) old('avec_rappel', $dossier->avec_rappel ?? false);
+    $nombreEnfantsChoisi = old('nombre_enfants', $dossier->nombre_enfants ?? 0);
+    $enfantMoins4Choisi = (bool) old('enfant_moins_de_4_ans', $dossier->enfant_moins_de_4_ans ?? false);
+    $situationFamilialeChoisie = old('situation_familiale', $dossier->situation_familiale);
+    $interruptionChoisie = (bool) old('interruption_contrat_plus_3_mois', $dossier->interruption_contrat_plus_3_mois ?? false);
+    $enfantIntegreChoisi = (bool) old('enfant_deja_integre', $dossier->enfant_deja_integre ?? false);
     $dateVisaChoisie = old('date_visa', $dossier->date_visa?->format('Y-m-d'));
     $dateActeChoisie = old('date_acte', $dossier->date_acte?->format('Y-m-d'));
     $numVisaChoisi = old('num_visa', $dossier->num_visa);
@@ -205,6 +210,75 @@
                                 <p class="mt-1 pl-7 text-xs text-gray-400">
                                     Concerne l'intégration (10) et le renouvellement de contrat (17) :
                                     deux exemplaires de plus de l'acte formaté.
+                                </p>
+                            </div>
+
+                            {{-- Renouvellement de contrat : la pièce dépend d'une interruption de service. --}}
+                            <div class="sm:col-span-2 rounded-lg border border-indigo-100 bg-indigo-50/40 p-4"
+                                 x-show="typeCode === '17'" x-cloak>
+                                <h4 class="text-sm font-semibold text-gray-700">Renouvellement de contrat (17)</h4>
+                                <div class="mt-3 flex items-center gap-3">
+                                    <input type="hidden" name="interruption_contrat_plus_3_mois" value="0"
+                                           x-bind:disabled="typeCode !== '17'">
+                                    <input id="interruption_contrat_plus_3_mois" name="interruption_contrat_plus_3_mois"
+                                           type="checkbox" value="1" @checked($interruptionChoisie)
+                                           x-bind:disabled="typeCode !== '17'"
+                                           class="h-4 w-4 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-200">
+                                    <x-input-label for="interruption_contrat_plus_3_mois"
+                                                   value="Interruption de contrat de plus de 3 mois" class="!mb-0" />
+                                </div>
+                                <p class="mt-1 pl-7 text-xs text-gray-500">
+                                    Si cette case est cochée, la pièce « Attestation de non interruption de service »
+                                    est ajoutée aux pièces exigées.
+                                </p>
+                            </div>
+
+                            {{-- Allocations familiales : les pièces dépendent des enfants et de la situation familiale. --}}
+                            <div class="sm:col-span-2 rounded-lg border border-indigo-100 bg-indigo-50/40 p-4"
+                                 x-show="typeCode === '60'" x-cloak>
+                                <h4 class="text-sm font-semibold text-gray-700">Allocations familiales (60)</h4>
+                                <p class="mt-1 text-xs text-gray-500">
+                                    Ces informations déterminent les pièces exigées : mariage ou célibat,
+                                    nombre d'enfants, enfant de moins de 4 ans et enfant déjà intégré.
+                                </p>
+                                <div class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div>
+                                        <x-input-label for="nombre_enfants" value="Nombre d'enfants" />
+                                        <x-text-input id="nombre_enfants" name="nombre_enfants" type="number" min="0" max="30"
+                                                      class="mt-1 block w-full" :value="$nombreEnfantsChoisi"
+                                                      x-bind:disabled="typeCode !== '60'" />
+                                        <x-input-error class="mt-2" :messages="$errors->get('nombre_enfants')" />
+                                    </div>
+                                    <div>
+                                        <x-input-label for="situation_familiale" value="Situation familiale" />
+                                        <select id="situation_familiale" name="situation_familiale"
+                                                x-bind:disabled="typeCode !== '60'"
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:text-gray-400">
+                                            <option value="">— Non renseignée —</option>
+                                            <option value="marie" @selected($situationFamilialeChoisie === 'marie')>Marié(e)</option>
+                                            <option value="celibataire" @selected($situationFamilialeChoisie === 'celibataire')>Célibataire</option>
+                                        </select>
+                                        <x-input-error class="mt-2" :messages="$errors->get('situation_familiale')" />
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <input type="hidden" name="enfant_moins_de_4_ans" value="0"
+                                               x-bind:disabled="typeCode !== '60'">
+                                        <input id="enfant_moins_de_4_ans" name="enfant_moins_de_4_ans" type="checkbox" value="1"
+                                               @checked($enfantMoins4Choisi) x-bind:disabled="typeCode !== '60'"
+                                               class="h-4 w-4 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-200">
+                                        <x-input-label for="enfant_moins_de_4_ans" value="Enfant de moins de 4 ans" class="!mb-0" />
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <input type="hidden" name="enfant_deja_integre" value="0"
+                                               x-bind:disabled="typeCode !== '60'">
+                                        <input id="enfant_deja_integre" name="enfant_deja_integre" type="checkbox" value="1"
+                                               @checked($enfantIntegreChoisi) x-bind:disabled="typeCode !== '60'"
+                                               class="h-4 w-4 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-200">
+                                        <x-input-label for="enfant_deja_integre" value="Enfant déjà intégré (CNAPS)" class="!mb-0" />
+                                    </div>
+                                </div>
+                                <p class="mt-2 text-xs text-gray-500">
+                                    Un enfant déjà intégré dispense de l'attestation de non paiement de la CNAPS.
                                 </p>
                             </div>
 

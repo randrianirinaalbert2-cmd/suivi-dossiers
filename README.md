@@ -48,6 +48,8 @@ Le site public pointe vers le serveur du poste de developpement : il n'y a rien 
 - Migration : php artisan migrate --force, apres accord explicite.
 - Code pris sur GitHub : git pull origin main, puis l'action correspondante ci-dessus.
 
+Mot de passe : change dans l'application ou dans la base, il est actif immediatement sur le site public. Deconnectez-vous puis reconnectez-vous. Aucun build ni redemarrage du tunnel.
+
 Si le lien public tombe, relancer la commande localtunnel : le nom srsp-suivi reste le meme.
 
 ## About Laravel

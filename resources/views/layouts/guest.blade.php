@@ -44,7 +44,7 @@
                         <img src="{{ asset('logo-mef.png') }}" alt="Armoiries — Ministère de l'Économie et des Finances"
                              class="h-16 w-16 shrink-0 rounded-2xl bg-white/95 p-1.5 shadow-2xl shadow-black/40 ring-1 ring-white/60">
                         <div class="leading-tight">
-                            <span class="block text-lg font-bold tracking-wide text-white">SRSP.AMM — Service Régional de la Solde et des Pensions</span>
+                            <span class="block text-lg font-bold tracking-wide text-white">{{ config('app.name') }}</span>
                             <span class="block text-sm text-cyan-200/90">Amoron'i Mania</span>
                         </div>
                     </div>
@@ -65,7 +65,7 @@
 
                     <div class="mt-12 flex flex-wrap items-center justify-between gap-4 text-xs text-cyan-200/80">
                         <span>© {{ now()->year }} — {{ config('app.name') }}</span>
-                        <span>SRSP.AMM — Amoron'i Mania</span>
+                        <span>Amoron'i Mania</span>
                     </div>
                 </div>
             </div>

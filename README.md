@@ -18,6 +18,8 @@ Valeur actuelle : `DIRECTION REGIONALE DU BUDGET ET DES FINANCES AMORON'I MANIA`
 
 Pour transformer ces textes dans quelques mois ou quelques années, il suffit de modifier ces deux clés. Aucune vue, aucun test ni migration n'est à toucher.
 
+Le **nom de l'application** (titre de la page, navigation, page de connexion et pied de page) se règle dans `APP_NAME` du fichier `.env` (modèle dans `.env.example`). Toutes les vues lisent `config('app.name')` : une seule ligne est à changer. Valeur actuelle : `SRSP.AMM — Gestion des dossiers et bordereaux`.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

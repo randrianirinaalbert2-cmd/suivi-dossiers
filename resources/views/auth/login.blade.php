@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="mb-6 flex items-center gap-4">
-        <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#0ea5e9,#06b6d4)] text-white shadow-lg shadow-indigo-500/30">
+        <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#3f7fa6,#2b6b8e)] text-white shadow-md shadow-slate-900/10">
             <x-icon.user class="h-6 w-6" />
         </span>
         <div>
@@ -29,7 +29,7 @@
             <div class="flex items-center justify-between">
                 <x-input-label for="mot_de_passe" :value="__('Password')" />
                 @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" class="text-xs font-medium text-indigo-600 hover:text-indigo-500 hover:underline">
+                    <a href="{{ route('password.request') }}" class="text-xs font-medium text-slate-600 hover:text-slate-500 hover:underline">
                         {{ __('Forgot your password?') }}
                     </a>
                 @endif
@@ -53,7 +53,7 @@
 
         <!-- Se souvenir de moi -->
         <label for="remember_me" class="inline-flex items-center gap-2 text-sm text-gray-600">
-            <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
+            <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-slate-600 shadow-sm focus:ring-slate-400" name="remember">
             {{ __('Remember me') }}
         </label>
 

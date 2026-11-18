@@ -31,10 +31,10 @@
         <div class="min-h-screen lg:grid lg:grid-cols-2">
 
             <!-- Panneau décoré (gauche) -->
-            <div class="relative hidden overflow-hidden bg-[radial-gradient(120%_120%_at_0%_0%,#0ea5e9_0%,#0c4a6e_45%,#082f49_100%)] p-10 text-white lg:flex lg:flex-col lg:justify-center xl:p-14">
-                <div class="pointer-events-none absolute -left-32 -top-40 h-[28rem] w-[28rem] rounded-full bg-cyan-400/20 blur-3xl"></div>
-                <div class="pointer-events-none absolute -right-28 top-1/2 h-[26rem] w-[26rem] -translate-y-1/2 rounded-full bg-sky-400/15 blur-3xl"></div>
-                <div class="pointer-events-none absolute -bottom-40 left-1/4 h-[30rem] w-[30rem] rounded-full bg-teal-300/10 blur-3xl"></div>
+            <div class="relative hidden overflow-hidden bg-[radial-gradient(120%_120%_at_0%_0%,#2a6d99_0%,#104763_45%,#082f49_100%)] p-10 text-white lg:flex lg:flex-col lg:justify-center xl:p-14">
+                <div class="pointer-events-none absolute -left-32 -top-40 h-[28rem] w-[28rem] rounded-full bg-cyan-400/10 blur-3xl"></div>
+                <div class="pointer-events-none absolute -right-28 top-1/2 h-[26rem] w-[26rem] -translate-y-1/2 rounded-full bg-sky-400/10 blur-3xl"></div>
+                <div class="pointer-events-none absolute -bottom-40 left-1/4 h-[30rem] w-[30rem] rounded-full bg-teal-300/[0.06] blur-3xl"></div>
                 <div class="pointer-events-none absolute inset-0 opacity-[0.06]"
                      style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 26px 26px;"></div>
                 <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,rgba(8,47,73,.4)_100%)]"></div>
@@ -45,25 +45,25 @@
                              class="h-16 w-16 shrink-0 rounded-full bg-white/95 p-1.5 shadow-2xl shadow-black/40 ring-1 ring-white/60">
                         <div class="leading-tight">
                             <span class="block text-lg font-bold tracking-wide text-white">SRSP.AMM — Service Régional de la Solde et des Pensions</span>
-                            <span class="block text-sm text-cyan-200/90">Amoron'i Mania</span>
+                            <span class="block text-sm text-sky-200/80">Amoron'i Mania</span>
                         </div>
                     </div>
 
                     <div class="mt-12 max-w-xl">
-                        <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-cyan-200 shadow-lg shadow-cyan-500/10 backdrop-blur">
+                        <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-sky-200/90 shadow-md shadow-sky-900/10 backdrop-blur">
                             <span class="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300"></span>
                             Application interne
                         </div>
                         <h1 class="text-4xl font-bold leading-tight xl:text-5xl">
                             Gestion des dossiers
-                            <span class="bg-[linear-gradient(90deg,#67e8f9,#22d3ee,#38bdf8)] bg-clip-text text-transparent">Solde et Visa</span>
+                            <span class="bg-[linear-gradient(90deg,#b4d7e8,#8fc3dd,#6fa8c8)] bg-clip-text text-transparent">Solde et Visa</span>
                         </h1>
-                        <p class="mt-4 max-w-lg text-base leading-relaxed text-sky-100/90">
+                        <p class="mt-4 max-w-lg text-base leading-relaxed text-slate-200/85">
                             Suivi, traçabilité et archivage des dossiers du SRSP.AMM.
                         </p>
                     </div>
 
-                    <div class="mt-12 flex flex-wrap items-center justify-between gap-4 text-xs text-cyan-200/80">
+                    <div class="mt-12 flex flex-wrap items-center justify-between gap-4 text-xs text-sky-200/70">
                         <span>© {{ now()->year }} — {{ config('app.name') }}</span>
                         <span>SRSP.AMM — Amoron'i Mania</span>
                     </div>
@@ -71,12 +71,12 @@
             </div>
 
             <!-- Formulaire (droite) -->
-            <div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f0f9ff] px-5 py-10 sm:px-8 lg:h-screen lg:overflow-y-auto">
+            <div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f7fafc] px-5 py-10 sm:px-8 lg:h-screen lg:overflow-y-auto">
                 <button type="button"
                         x-data="{ sombre: document.documentElement.classList.contains('dark') }"
                         @click="sombre = !sombre; document.documentElement.classList.toggle('dark', sombre); localStorage.setItem('theme', sombre ? 'dark' : 'light')"
                         aria-label="Basculer entre le mode sombre et le mode clair"
-                        class="absolute right-5 top-5 z-20 inline-flex items-center gap-2 rounded-lg border border-indigo-200 bg-white/75 px-3 py-1.5 text-xs font-medium text-indigo-700 shadow-sm backdrop-blur transition hover:scale-105 dark:border-white/15 dark:bg-white/10 dark:text-indigo-200">
+                        class="absolute right-5 top-5 z-20 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white/75 px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm backdrop-blur transition hover:scale-105 dark:border-white/15 dark:bg-white/10 dark:text-indigo-200">
                     <svg class="h-4 w-4" x-show="!sombre" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.9 4.9l1.1 1.1M18 18l1.1 1.1M3 12h1.5M19.5 12H21M4.9 19.1l1.1-1.1M18 6l1.1-1.1"/>
                         <circle cx="12" cy="12" r="3.5"/>
@@ -88,36 +88,36 @@
                     <span x-show="sombre" x-cloak>Clair</span>
                 </button>
                 <!-- Fond : halos colorés -->
-                <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(45rem_45rem_at_10%_-10%,rgba(14,165,233,.28),transparent_60%),radial-gradient(40rem_40rem_at_105%_15%,rgba(6,182,212,.24),transparent_55%),radial-gradient(38rem_38rem_at_50%_115%,rgba(34,211,238,.20),transparent_60%)]"></div>
+                <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(45rem_45rem_at_10%_-10%,rgba(14,165,233,.14),transparent_60%),radial-gradient(40rem_40rem_at_105%_15%,rgba(6,182,212,.12),transparent_55%),radial-gradient(38rem_38rem_at_50%_115%,rgba(34,211,238,.10),transparent_60%)]"></div>
 
                 <!-- Fond : trame fine -->
-                <div class="pointer-events-none absolute inset-0 opacity-40"
+                <div class="pointer-events-none absolute inset-0 opacity-25"
                      style="background-image: linear-gradient(rgba(14,165,233,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,.10) 1px, transparent 1px); background-size: 34px 34px; -webkit-mask-image: radial-gradient(circle at 50% 40%, black, transparent 80%); mask-image: radial-gradient(circle at 50% 40%, black, transparent 80%);"></div>
 
                 <!-- Formes flottantes -->
-                <div class="pointer-events-none absolute left-[6%] top-[14%] h-24 w-24 rotate-12 rounded-[2rem] bg-[linear-gradient(135deg,rgba(14,165,233,.45),rgba(6,182,212,.30))] blur-[1px] animate-pulse" style="animation-duration:6s"></div>
-                <div class="pointer-events-none absolute right-[8%] top-[60%] h-16 w-16 -rotate-12 rounded-full bg-[linear-gradient(135deg,rgba(34,211,238,.40),rgba(45,212,191,.30))] blur-[1px] animate-pulse" style="animation-duration:7s"></div>
-                <div class="pointer-events-none absolute bottom-[8%] left-[14%] h-20 w-20 rotate-6 rounded-3xl border-2 border-sky-400/40 animate-pulse" style="animation-duration:8s"></div>
+                <div class="pointer-events-none absolute left-[6%] top-[14%] h-24 w-24 rotate-12 rounded-[2rem] bg-[linear-gradient(135deg,rgba(14,165,233,.22),rgba(6,182,212,.16))] blur-[1px] animate-pulse" style="animation-duration:6s"></div>
+                <div class="pointer-events-none absolute right-[8%] top-[60%] h-16 w-16 -rotate-12 rounded-full bg-[linear-gradient(135deg,rgba(34,211,238,.20),rgba(45,212,191,.14))] blur-[1px] animate-pulse" style="animation-duration:7s"></div>
+                <div class="pointer-events-none absolute bottom-[8%] left-[14%] h-20 w-20 rotate-6 rounded-3xl border-2 border-sky-400/25 animate-pulse" style="animation-duration:8s"></div>
 
                 <div class="relative z-10 w-full max-w-lg">
 
                     <!-- Marque -->
                     <div class="mb-6 flex items-center justify-center gap-3">
-                        <span class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/70 bg-[linear-gradient(135deg,#0ea5e9,#06b6d4)] text-white shadow-xl shadow-indigo-500/40 ring-4 ring-white/70">
+                        <span class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/70 bg-[linear-gradient(135deg,#3f7fa6,#2b6b8e)] text-white shadow-md shadow-slate-900/10 ring-4 ring-white/60">
                             <x-icon.folder class="h-6 w-6" />
                         </span>
                         <div class="leading-tight">
                             <span class="block text-base font-bold text-gray-900">Gestion des dossiers, bordereaux</span>
-                            <span class="block text-xs font-medium uppercase tracking-wider text-indigo-500">de Solde et Visas</span>
+                            <span class="block text-xs font-medium uppercase tracking-wider text-slate-500">de Solde et Visas</span>
                         </div>
                     </div>
 
                     <!-- Carte du formulaire -->
                     <div class="relative">
-                        <div class="pointer-events-none absolute -inset-3 rounded-[2rem] bg-[linear-gradient(135deg,rgba(14,165,233,.35),rgba(6,182,212,.25),rgba(34,211,238,.20))] blur-xl opacity-70"></div>
+                        <div class="pointer-events-none absolute -inset-3 rounded-[2rem] bg-[linear-gradient(135deg,rgba(14,165,233,.20),rgba(6,182,212,.14),rgba(34,211,238,.10))] blur-xl opacity-40"></div>
 
-                        <div class="relative overflow-hidden rounded-3xl border border-white/70 bg-white/85 shadow-2xl shadow-sky-950/10 backdrop-blur-xl">
-                            <div class="h-1.5 bg-[linear-gradient(90deg,#0ea5e9,#06b6d4,#22d3ee)]"></div>
+                        <div class="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 shadow-xl shadow-slate-900/10 backdrop-blur-xl">
+                            <div class="h-0.5 bg-[linear-gradient(90deg,#4a86ad,#2f7396,#5f9cc0)]"></div>
 
                             <div class="p-6 sm:p-8">
                                 {{ $slot }}
@@ -128,15 +128,15 @@
                     <!-- Barre de confiance -->
                     <div class="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-gray-500">
                         <span class="inline-flex items-center gap-1.5">
-                            <svg class="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Z"/><path stroke-linecap="round" stroke-linejoin="round" d="m9 12 2 2 4-4"/></svg>
+                            <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Z"/><path stroke-linecap="round" stroke-linejoin="round" d="m9 12 2 2 4-4"/></svg>
                             Connexion sécurisée
                         </span>
                         <span class="inline-flex items-center gap-1.5">
-                            <svg class="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><circle cx="12" cy="12" r="8.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5V12l3 1.8"/></svg>
+                            <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><circle cx="12" cy="12" r="8.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5V12l3 1.8"/></svg>
                             Accès 24h/24
                         </span>
                         <span class="inline-flex items-center gap-1.5">
-                            <svg class="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h10"/></svg>
+                            <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h10"/></svg>
                             Traçabilité
                         </span>
                     </div>

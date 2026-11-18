@@ -56,9 +56,9 @@
                 <img src="{{ asset('logo-mef.png') }}" alt="Ministère de l'Économie et des Finances"><br>
                 SECRETARIAT GENERAL<br>
                 DIRECTION GENERALE DU BUDGET ET DES FINANCES<br>
-                DIRECTION DE LA SOLDE ET DES PENSIONS<br>
-                SERVICE REGIONAL DE LA SOLDE ET DES PENSIONS<br>
-                -AMORON'I MANIA-
+                @foreach (config('soit_transmis.entete_administration') as $ligne)
+                    {{ $ligne }}@if (! $loop->last)<br>@endif
+                @endforeach
             </td>
             <td class="centre">
                 REPOBLIKAN'I MADAGASIKARA<br>

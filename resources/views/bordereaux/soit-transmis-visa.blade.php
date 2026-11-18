@@ -67,11 +67,9 @@
                         DIRECTION GENERALE DU BUDGET<br>
                         ET DES FINANCES<br>
                         ---------------------------<br>
-                        DIRECTION DE LA SOLDE ET DES PENSIONS<br>
-                        ---------------------------<br>
-                        SERVICE REGIONAL DE LA SOLDE<br>
-                        ET DES PENSIONS<br>
-                        -AMORON'I MANIA-
+                        @foreach (config('soit_transmis.entete_administration') as $ligne)
+                            {{ $ligne }}@if (! $loop->last)<br>---------------------------<br>@endif
+                        @endforeach
                     </td>
                     <td class="droite">
                         <div class="titre">SOIT TRANSMIS</div>
@@ -85,7 +83,7 @@
                 </tr>
             </table>
 
-            <div class="numero">N° ____________ {{ $annee }}/MEF/SG/DGBF/DSP/SRSP.AMM</div>
+            <div class="numero">N° ____________ {{ $annee }}/{{ config('soit_transmis.reference_suffixe') }}</div>
 
             <p class="objet">{{ $note['intitule'] }} {{ count($note['agents']) > 1 ? 'aux noms de' : 'au nom de' }} :</p>
 

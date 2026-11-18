@@ -37,6 +37,27 @@ return [
     'destinataire_par_defaut' => 'delegue',
 
     /*
+    | En-tête de l'administration émettrice, commun aux deux divisions.
+    |
+    | Ces lignes remplacent l'ancien « SERVICE REGIONAL DE LA SOLDE ET DES
+    | PENSIONS - AMORON'I MANIA - » dans le bordereau d'envoi (Solde) et dans
+    | les notes « Soit transmis » (Solde et Visa). Pour changer d'intitulé
+    | plus tard, il suffit de modifier ce bloc : aucune vue n'est à toucher.
+    |
+    | @var list<string>
+    */
+    'entete_administration' => [
+        'DIRECTION REGIONALE DU BUDGET ET DES FINANCES',
+        "AMORON'I MANIA",
+    ],
+
+    /*
+    | Partie fixe du numéro de référence, commune aux deux divisions.
+    | L'année est ajoutée par les vues.
+    */
+    'reference_suffixe' => 'MEF/SG/DGBF/DSP/DRBF.AMM',
+
+    /*
     | Intitulés d'après les modèles de « Soit transmis » du Visa.
     |
     | La première règle qui correspond au libellé du type de dossier est

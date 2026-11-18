@@ -64,11 +64,9 @@
                 <div class="tiret">---------------</div>
                 DIRECTION GENERALE DU BUDGET<br>ET DES FINANCES
                 <div class="tiret">---------------</div>
-                DIRECTION DE LA SOLDE ET DES PENSIONS
-                <div class="tiret">----------------</div>
-                SERVICE REGIONAL DE LA SOLDE<br>ET DES PENSIONS
-                <br><br>
-                AMORON'I MANIA
+                @foreach (config('soit_transmis.entete_administration') as $ligne)
+                    {{ $ligne }}@if (! $loop->last)<br>@endif
+                @endforeach
             </td>
             <td class="droite">
                 <div class="date">Ambositra le,</div>
@@ -83,7 +81,7 @@
 
     {{-- Le numéro de référence est écrit à la main par le chef de division --}}
     <div class="numero">
-        N°<span class="blanc"></span>/{{ $bordereau->annee }}/MEF/SG/DGBF/DSP/SRSP.AMM.SOLDE
+        N°<span class="blanc"></span>/{{ $bordereau->annee }}/{{ config('soit_transmis.reference_suffixe') }}
     </div>
 
     <div class="titre">-<strong><u>BORDEREAU D'ENVOI</u></strong>-</div>

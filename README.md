@@ -18,7 +18,7 @@ Valeur actuelle : `DIRECTION REGIONALE DU BUDGET ET DES FINANCES AMORON'I MANIA`
 
 Pour transformer ces textes dans quelques mois ou quelques années, il suffit de modifier ces deux clés. Aucune vue, aucun test ni migration n'est à toucher.
 
-Le **nom de l'application** (titre de la page, navigation, page de connexion et pied de page) se règle dans `APP_NAME` du fichier `.env` (modèle dans `.env.example`). Toutes les vues lisent `config('app.name')` : une seule ligne est à changer. Valeur actuelle : `SRSP.AMM — Gestion des dossiers et bordereaux`.
+Le **nom de l'application** (titre de la page, navigation, page de connexion et pied de page) se règle dans `APP_NAME` du fichier `.env` (modèle dans `.env.example`). Toutes les vues lisent `config('app.name')` : une seule ligne est à changer. Valeur actuelle : `srsp-suivi-des-dossiers-Solde-Visas`.
 
 ## Accès Internet temporaire (démonstration)
 

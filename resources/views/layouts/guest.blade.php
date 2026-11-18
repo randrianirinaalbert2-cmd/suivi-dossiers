@@ -59,7 +59,7 @@
                             <span class="bg-[linear-gradient(90deg,#67e8f9,#22d3ee,#38bdf8)] bg-clip-text text-transparent">Solde et Visa</span>
                         </h1>
                         <p class="mt-4 max-w-lg text-base leading-relaxed text-sky-100/90">
-                            Suivi, traçabilité et archivage des dossiers du SRSP.AMM.
+                            Suivi, traçabilité et archivage des dossiers Solde et Visa.
                         </p>
                     </div>
 

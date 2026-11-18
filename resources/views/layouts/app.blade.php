@@ -34,7 +34,7 @@
             <div class="zone-contenu min-w-0 w-full pt-14 transition-[padding-inline-start] duration-200 ease-out" :class="menuOuvert ? 'lg:ps-64' : 'lg:ps-0'">
                 <!-- Page Heading -->
                 @isset($header)
-                    <header class="entete-page no-print bg-[linear-gradient(90deg,#ffffff_0%,#eef2ff_55%,#faf5ff_100%)] border-b border-indigo-100 shadow-sm">
+                    <header class="entete-page no-print bg-[linear-gradient(90deg,#ffffff_0%,#f5f7fa_55%,#f8fafc_100%)] border-b border-slate-200 shadow-sm">
                         <div class="mx-auto py-6 px-4 sm:px-6 lg:px-8 transition-all duration-200" :class="menuOuvert ? 'max-w-7xl' : 'max-w-full'">
                             {{ $header }}
                         </div>

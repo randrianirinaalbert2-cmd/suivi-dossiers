@@ -23,6 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RestreindreRole::class,
             'matricule' => 'App\Http\Middleware\ExigerDivisionMatricule',
         ]);
+
+        // Le site peut etre servi derriere un proxy (tunnel HTTPS, Nginx) :
+        // sans cela, Laravel croit que la requete est en HTTP et les liens
+        // et les assets seraient bloques en contenu mixte.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

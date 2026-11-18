@@ -20,6 +20,16 @@ Pour transformer ces textes dans quelques mois ou quelques années, il suffit de
 
 Le **nom de l'application** (titre de la page, navigation, page de connexion et pied de page) se règle dans `APP_NAME` du fichier `.env` (modèle dans `.env.example`). Toutes les vues lisent `config('app.name')` : une seule ligne est à changer. Valeur actuelle : `SRSP.AMM — Gestion des dossiers et bordereaux`.
 
+## Accès Internet temporaire (démonstration)
+
+Pour montrer l'application hors du réseau local, un tunnel Cloudflare peut être lancé depuis le poste de développement :
+
+```powershell
+.\storage\app\cloudflared.exe tunnel --url http://localhost:8000
+```
+
+L'adresse `https://…trycloudflare.com` affichée change à chaque lancement. Le serveur Laravel et le PC doivent rester allumés. Avant toute exposition publique, changer les mots de passe de test et laisser `APP_DEBUG=false`.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

@@ -42,9 +42,9 @@
                 <div class="relative z-10 flex h-full flex-col justify-center">
                     <div class="flex items-center gap-4">
                         <img src="{{ asset('logo-mef.png') }}" alt="Armoiries — Ministère de l'Économie et des Finances"
-                             class="h-16 w-16 shrink-0 rounded-2xl bg-white/95 p-1.5 shadow-2xl shadow-black/40 ring-1 ring-white/60">
+                             class="h-16 w-16 shrink-0 rounded-full bg-white/95 p-1.5 shadow-2xl shadow-black/40 ring-1 ring-white/60">
                         <div class="leading-tight">
-                            <span class="block text-lg font-bold tracking-wide text-white">{{ config('app.name') }}</span>
+                            <span class="block text-lg font-bold tracking-wide text-white">SRSP.AMM — Service Régional de la Solde et des Pensions</span>
                             <span class="block text-sm text-cyan-200/90">Amoron'i Mania</span>
                         </div>
                     </div>
@@ -59,13 +59,13 @@
                             <span class="bg-[linear-gradient(90deg,#67e8f9,#22d3ee,#38bdf8)] bg-clip-text text-transparent">Solde et Visa</span>
                         </h1>
                         <p class="mt-4 max-w-lg text-base leading-relaxed text-sky-100/90">
-                            Suivi, traçabilité et archivage des dossiers Solde et Visa.
+                            Suivi, traçabilité et archivage des dossiers du SRSP.AMM.
                         </p>
                     </div>
 
                     <div class="mt-12 flex flex-wrap items-center justify-between gap-4 text-xs text-cyan-200/80">
                         <span>© {{ now()->year }} — {{ config('app.name') }}</span>
-                        <span>Amoron'i Mania</span>
+                        <span>SRSP.AMM — Amoron'i Mania</span>
                     </div>
                 </div>
             </div>

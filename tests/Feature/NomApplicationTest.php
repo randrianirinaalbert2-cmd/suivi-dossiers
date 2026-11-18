@@ -12,12 +12,13 @@ class NomApplicationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_la_page_de_connexion_affiche_le_nom_unique_de_lapplication(): void
+    public function test_la_page_de_connexion_garde_lidentite_srsp_amm_et_affiche_le_nom_de_lapplication(): void
     {
         $this->get(route('login'))
             ->assertOk()
-            ->assertSee(config('app.name'))
-            ->assertDontSee('Service Régional de la Solde et des Pensions');
+            ->assertSee('SRSP.AMM — Service Régional de la Solde et des Pensions')
+            ->assertSee("SRSP.AMM — Amoron'i Mania", false)
+            ->assertSee(config('app.name'));
     }
 
     public function test_la_navigation_affiche_le_meme_nom_que_la_page_de_connexion(): void

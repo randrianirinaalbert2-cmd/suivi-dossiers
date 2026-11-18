@@ -98,7 +98,7 @@
         </svg>
     </button>
     <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5">
-        <img src="{{ asset('logo-mef.png') }}" alt="Armoiries — Ministère de l'Économie et des Finances" class="h-9 w-9 shrink-0 rounded-lg bg-white/90 p-0.5 shadow-md shadow-black/30">
+        <img src="{{ asset('logo-mef.png') }}" alt="Armoiries — Ministère de l'Économie et des Finances" class="h-9 w-9 shrink-0 rounded-full bg-white/90 p-0.5 shadow-md shadow-black/30">
         <span class="leading-tight">
             <span class="block text-sm font-semibold text-white">{{ config('app.name') }}</span>
             <span class="hidden text-xs text-indigo-300 lg:block">de Solde et Visas</span>

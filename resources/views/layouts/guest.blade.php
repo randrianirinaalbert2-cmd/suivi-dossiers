@@ -20,7 +20,7 @@
         <script>
             (function () {
                 var theme = localStorage.getItem('theme');
-                var sombre = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                var sombre = theme === 'dark';
                 if (sombre) {
                     document.documentElement.classList.add('dark');
                 }

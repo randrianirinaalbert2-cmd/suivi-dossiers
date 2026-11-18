@@ -33,10 +33,10 @@ L'adresse `https://…trycloudflare.com` affichée change à chaque lancement. L
 Pour obtenir une adresse **lisible et choisie** sans acheter de domaine, localtunnel peut être utilisé :
 
 ```powershell
-npx --yes localtunnel --port 8000 --subdomain srsp-suivi
+npx --yes localtunnel --port 8000 --subdomain srsp-suivi-dossiers
 ```
 
-Elle donne `https://srsp-suivi.loca.lt`, active tant que la commande tourne.
+Elle donne `https://srsp-suivi-dossiers.loca.lt`, active tant que la commande tourne. L'adresse precedente `https://srsp-suivi.loca.lt` reste disponible comme secours tant que son tunnel tourne. Ouvrir la racine `/` redirige automatiquement vers `/login`.
 
 ## Apres une modification
 
@@ -50,7 +50,7 @@ Le site public pointe vers le serveur du poste de developpement : il n'y a rien 
 
 Mot de passe : change dans l'application ou dans la base, il est actif immediatement sur le site public. Deconnectez-vous puis reconnectez-vous. Aucun build ni redemarrage du tunnel.
 
-Si le lien public tombe, relancer la commande localtunnel : le nom srsp-suivi reste le meme.
+Si le lien public tombe, relancer la commande localtunnel : le nom srsp-suivi-dossiers reste le meme.
 
 ## About Laravel
 

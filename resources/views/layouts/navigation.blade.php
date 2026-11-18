@@ -89,10 +89,10 @@
 @endphp
 
 <!-- Barre supérieure (tous les écrans) -->
-<div class="fixed inset-x-0 top-0 z-50 h-14 bg-[linear-gradient(90deg,#0e3f5c_0%,#1d6b96_55%,#2f7396_100%)] flex items-center gap-3 px-4 shadow-lg shadow-black/30 no-print">
+<div class="fixed inset-x-0 top-0 z-50 h-14 bg-[linear-gradient(90deg,#082f49_0%,#0369a1_55%,#0891b2_100%)] flex items-center gap-3 px-4 shadow-lg shadow-black/30 no-print">
     <button type="button" @click="menuOuvert = ! menuOuvert"
             aria-label="Ouvrir ou fermer le menu"
-            class="-ms-1 rounded-md p-2 text-sky-200 transition hover:bg-white/10 hover:text-white">
+            class="-ms-1 rounded-md p-2 text-indigo-200 transition hover:bg-white/10 hover:text-white">
         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" :d="menuOuvert ? 'M6 18 18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'" />
         </svg>
@@ -101,7 +101,7 @@
         <img src="{{ asset('logo-mef.png') }}" alt="Armoiries — Ministère de l'Économie et des Finances" class="h-9 w-9 shrink-0 rounded-full bg-white/90 p-0.5 shadow-md shadow-black/30">
         <span class="leading-tight">
             <span class="block text-sm font-semibold text-white">{{ config('app.name') }}</span>
-            <span class="hidden text-xs text-sky-300 lg:block">de Solde et Visas</span>
+            <span class="hidden text-xs text-indigo-300 lg:block">de Solde et Visas</span>
         </span>
     </a>
     {{-- Notifications : toujours visibles, la pastille n'apparaît qu'en cas d'alerte --}}
@@ -125,7 +125,7 @@
                         'relative rounded-md p-2 transition hover:bg-white/10',
                         $alerteRejetesCount > 0
                             ? 'text-rose-300 hover:text-rose-100'
-                            : 'text-sky-200 hover:text-white',
+                            : 'text-indigo-200 hover:text-white',
                     ])>
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
@@ -175,13 +175,13 @@
                 </ul>
 
                 <a href="{{ route('dashboard') }}"
-                   class="block border-t border-gray-100 px-4 py-3 text-center text-sm font-semibold text-slate-600 transition hover:bg-slate-50 dark:border-gray-700 dark:text-sky-300 dark:hover:bg-gray-700/40">
+                   class="block border-t border-gray-100 px-4 py-3 text-center text-sm font-semibold text-indigo-600 transition hover:bg-indigo-50 dark:border-gray-700 dark:text-indigo-300 dark:hover:bg-gray-700/40">
                     {{ $alerteRejetesCount > $alerteRejetes->count() ? 'Voir les '.$alerteRejetesCount.' alertes' : 'Voir le tableau de bord' }}
                 </a>
             </div>
 
         <a href="{{ route('profile.edit') }}"
-           class="hidden items-center gap-2 rounded-full py-1 pe-2 ps-1 text-xs text-sky-100 transition hover:bg-white/10 hover:text-white sm:flex"
+           class="hidden items-center gap-2 rounded-full py-1 pe-2 ps-1 text-xs text-indigo-100 transition hover:bg-white/10 hover:text-white sm:flex"
            title="Mon profil">
             <x-avatar :utilisateur="$utilisateur" taille="h-7 w-7" texte="text-[10px]" contour="ring-2 ring-white/30" />
             <span class="max-w-[12rem] truncate">{{ $utilisateur->nom }}</span>
@@ -191,7 +191,7 @@
                 x-data="{ sombre: document.documentElement.classList.contains('dark') }"
                 @click="sombre = !sombre; document.documentElement.classList.toggle('dark', sombre); localStorage.setItem('theme', sombre ? 'dark' : 'light')"
                 aria-label="Basculer entre le mode sombre et le mode clair"
-                class="rounded-md p-2 text-sky-200 transition hover:bg-white/10 hover:text-white">
+                class="rounded-md p-2 text-indigo-200 transition hover:bg-white/10 hover:text-white">
             <svg class="h-5 w-5" x-show="!sombre" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.9 4.9l1.1 1.1M18 18l1.1 1.1M3 12h1.5M19.5 12H21M4.9 19.1l1.1-1.1M18 6l1.1-1.1"/>
                 <circle cx="12" cy="12" r="3.5"/>
@@ -210,13 +210,13 @@
 
 <!-- Menu latéral gauche -->
 <aside x-cloak
-       class="no-print fixed bottom-0 left-0 top-14 z-40 flex w-64 flex-col bg-[linear-gradient(180deg,#0e3f5c_0%,#175a7d_45%,#245f7d_100%)] shadow-xl shadow-black/30 transition-transform duration-200 ease-out"
+       class="no-print fixed bottom-0 left-0 top-14 z-40 flex w-64 flex-col bg-[linear-gradient(180deg,#082f49_0%,#075985_45%,#0e7490_100%)] shadow-xl shadow-black/30 transition-transform duration-200 ease-out"
        :class="menuOuvert ? 'translate-x-0' : '-translate-x-full'">
 
     <div class="flex h-14 shrink-0 items-center justify-between border-b border-white/10 px-4">
         <span class="text-sm font-semibold text-white">Menu</span>
         <button type="button" @click="menuOuvert = false" aria-label="Fermer le menu"
-                class="rounded-md p-1.5 text-sky-300 transition hover:bg-white/10 hover:text-white">
+                class="rounded-md p-1.5 text-indigo-300 transition hover:bg-white/10 hover:text-white">
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
             </svg>
@@ -233,11 +233,11 @@
                @class([
                    'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition',
                    $lienActif
-                   ? 'bg-[linear-gradient(90deg,#3f7fa6,#2b6b8e)] text-white shadow-md shadow-black/25'
-                   : 'text-sky-200 hover:bg-white/10 hover:text-white',
+                   ? 'bg-[linear-gradient(90deg,#0284c7,#06b6d4)] text-white shadow-md shadow-black/25'
+                   : 'text-indigo-200 hover:bg-white/10 hover:text-white',
            ])>
             <svg class="h-5 w-5 shrink-0 transition"
-                 @class([$lienActif ? 'text-white' : 'text-sky-300 group-hover:text-white'])
+                 @class([$lienActif ? 'text-white' : 'text-indigo-300 group-hover:text-white'])
                      fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     {!! $lien['icone'] !!}
                 </svg>
@@ -250,14 +250,14 @@
             <button type="button" @click.stop="ouvert = ! ouvert"
                     @class([
                         'group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition',
-                        $archiveOuvert ? 'text-white' : 'text-sky-200 hover:bg-white/10 hover:text-white',
+                        $archiveOuvert ? 'text-white' : 'text-indigo-200 hover:bg-white/10 hover:text-white',
                     ])>
-                <svg class="h-5 w-5 shrink-0" @class([$archiveOuvert ? 'text-sky-200' : 'text-sky-300 group-hover:text-white'])
+                <svg class="h-5 w-5 shrink-0" @class([$archiveOuvert ? 'text-indigo-200' : 'text-indigo-300 group-hover:text-white'])
                      fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 7.5h16M5.5 7.5V18a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5V7.5M6.5 7.5V5.5A1.5 1.5 0 0 1 8 4h8a1.5 1.5 0 0 1 1.5 1.5v2M9.5 11.5h5"/>
                 </svg>
                 <span class="flex-1 text-start">Archives</span>
-                <svg class="h-4 w-4 shrink-0 text-sky-400 transition-transform duration-200"
+                <svg class="h-4 w-4 shrink-0 text-indigo-400 transition-transform duration-200"
                      :class="ouvert ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
                 </svg>
@@ -271,10 +271,10 @@
                        @class([
                            'group flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm transition',
                            $surArchivesCreation
-                               ? 'bg-sky-400/15 font-medium text-white ring-1 ring-sky-300/25'
-                               : 'text-sky-100/80 hover:bg-white/10 hover:text-white',
+                               ? 'bg-cyan-400/20 font-medium text-white ring-1 ring-cyan-300/30'
+                               : 'text-cyan-100/80 hover:bg-white/10 hover:text-white',
                        ])>
-                        <svg class="h-4 w-4 shrink-0" @class([$surArchivesCreation ? 'text-sky-200' : 'text-sky-300/80 group-hover:text-white'])
+                        <svg class="h-4 w-4 shrink-0" @class([$surArchivesCreation ? 'text-cyan-200' : 'text-cyan-300/80 group-hover:text-white'])
                              fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M7 3.5h6.5L18 8v11.5a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1Z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 3.5V8H18"/>
@@ -287,10 +287,10 @@
                    @class([
                        'group flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm transition',
                        $surArchives
-                           ? 'bg-sky-400/15 font-medium text-white ring-1 ring-sky-300/25'
-                           : 'text-sky-100/80 hover:bg-white/10 hover:text-white',
+                           ? 'bg-cyan-400/20 font-medium text-white ring-1 ring-cyan-300/30'
+                           : 'text-cyan-100/80 hover:bg-white/10 hover:text-white',
                    ])>
-                    <svg class="h-4 w-4 shrink-0" @class([$surArchives ? 'text-sky-200' : 'text-sky-300/80 group-hover:text-white'])
+                    <svg class="h-4 w-4 shrink-0" @class([$surArchives ? 'text-cyan-200' : 'text-cyan-300/80 group-hover:text-white'])
                          fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 12V10a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8Z"/>
                     </svg>
@@ -304,11 +304,11 @@
            @class([
                'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition',
                request()->routeIs('statistiques.*')
-               ? 'bg-[linear-gradient(90deg,#3f7fa6,#2b6b8e)] text-white shadow-md shadow-black/25'
-               : 'text-sky-200 hover:bg-white/10 hover:text-white',
+               ? 'bg-[linear-gradient(90deg,#0284c7,#06b6d4)] text-white shadow-md shadow-black/25'
+               : 'text-indigo-200 hover:bg-white/10 hover:text-white',
            ])>
             <svg class="h-5 w-5 shrink-0 transition"
-                 @class([request()->routeIs('statistiques.*') ? 'text-white' : 'text-sky-300 group-hover:text-white'])
+                 @class([request()->routeIs('statistiques.*') ? 'text-white' : 'text-indigo-300 group-hover:text-white'])
                  fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
             </svg>
@@ -320,16 +320,16 @@
                 <button type="button" @click.stop="ouvert = ! ouvert"
                         @class([
                             'group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition',
-                            $parametrageOuvert ? 'text-white' : 'text-sky-200 hover:bg-white/10 hover:text-white',
+                            $parametrageOuvert ? 'text-white' : 'text-indigo-200 hover:bg-white/10 hover:text-white',
                         ])>
-                    <svg class="h-5 w-5 shrink-0" @class([$parametrageOuvert ? 'text-sky-200' : 'text-sky-300 group-hover:text-white'])
+                    <svg class="h-5 w-5 shrink-0" @class([$parametrageOuvert ? 'text-indigo-200' : 'text-indigo-300 group-hover:text-white'])
                          fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 17h16"/>
                         <circle cx="9" cy="7" r="2.4"/>
                         <circle cx="15" cy="17" r="2.4"/>
                     </svg>
                     <span class="flex-1 text-start">Paramétrage</span>
-                    <svg class="h-4 w-4 shrink-0 text-sky-400 transition-transform duration-200"
+                    <svg class="h-4 w-4 shrink-0 text-indigo-400 transition-transform duration-200"
                          :class="ouvert ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
                     </svg>
@@ -343,11 +343,11 @@
                            @class([
                                'group flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm transition',
                                request()->routeIs($item['route'])
-                                   ? 'bg-sky-400/15 font-medium text-white ring-1 ring-sky-300/25'
-                                   : 'text-sky-100/80 hover:bg-white/10 hover:text-white',
+                                   ? 'bg-cyan-400/20 font-medium text-white ring-1 ring-cyan-300/30'
+                                   : 'text-cyan-100/80 hover:bg-white/10 hover:text-white',
                            ])>
                             <svg class="h-4 w-4 shrink-0"
-                                 @class([request()->routeIs($item['route']) ? 'text-sky-200' : 'text-sky-300/80 group-hover:text-white'])
+                                 @class([request()->routeIs($item['route']) ? 'text-cyan-200' : 'text-cyan-300/80 group-hover:text-white'])
                                  fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 {!! $item['icone'] !!}
                             </svg>
@@ -366,13 +366,13 @@
             </a>
             <div class="min-w-0">
                 <div class="truncate text-sm font-medium text-white">{{ $utilisateur->nom }}</div>
-                <div class="truncate text-xs text-sky-300">{{ $roleDivision }}</div>
+                <div class="truncate text-xs text-indigo-300">{{ $roleDivision }}</div>
             </div>
         </div>
 
         <div class="mt-3 flex items-center gap-2">
             <a href="{{ route('profile.edit') }}"
-               class="flex flex-1 items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-1.5 text-sm text-sky-200 transition hover:bg-white/10 hover:text-white">
+               class="flex flex-1 items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-1.5 text-sm text-indigo-200 transition hover:bg-white/10 hover:text-white">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <circle cx="12" cy="8" r="3.5"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 19.5c1.3-3.3 4-5 7-5s5.7 1.7 7 5"/>
@@ -383,7 +383,7 @@
             <form method="POST" action="{{ route('logout') }}" class="flex-1">
                 @csrf
                 <button type="submit"
-                        class="flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-1.5 text-sm text-sky-200 transition hover:border-rose-400/40 hover:bg-rose-500/20 hover:text-rose-200">
+                        class="flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-1.5 text-sm text-indigo-200 transition hover:border-rose-400/40 hover:bg-rose-500/20 hover:text-rose-200">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H4m0 0 3.5-3.5M4 12l3.5 3.5"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 4h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-8"/>

@@ -138,8 +138,9 @@
     </table>
 
     <div class="pied">
-        Direction de la Solde et des Pensions<br>
-        Service Régional de la Solde et des Pensions Amoron'i Mania<br>
+        @foreach (config('soit_transmis.entete_administration') as $ligne)
+            {{ $ligne }}<br>
+        @endforeach
         Lot 03A 83B Ambohibary Ambositra<br>
         Contacts : 032 11 09 168
     </div>

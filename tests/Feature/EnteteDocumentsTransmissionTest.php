@@ -80,7 +80,8 @@ class EnteteDocumentsTransmissionTest extends TestCase
             ->assertSee(self::ENTETE[0])
             ->assertSee(self::ENTETE[1])
             ->assertSee('2026/'.self::REFERENCE)
-            ->assertDontSee('SRSP.AMM.SOLDE');
+            ->assertDontSee('SRSP.AMM.SOLDE')
+            ->assertDontSee("Service Régional de la Solde et des Pensions Amoron'i Mania");
     }
 
     public function test_la_note_soit_transmis_solde_affiche_la_nouvelle_entete(): void
@@ -95,6 +96,41 @@ class EnteteDocumentsTransmissionTest extends TestCase
             ->assertSee(self::ENTETE[0])
             ->assertSee(self::ENTETE[1])
             ->assertDontSee('SERVICE REGIONAL DE LA SOLDE ET DES PENSIONS<br>');
+    }
+
+    public function test_le_cachet_du_bordereau_recu_utilise_aussi_la_zone(): void
+    {
+        $division = Division::create(['nom' => Division::NOM_SOLDE]);
+        $utilisateur = $this->administrateur($division);
+        $type = $this->typeDossier($division);
+
+        $bordereau = BordereauRecu::create([
+            'division_id' => $division->id,
+            'service_origine_id' => ServiceOrigine::create(['nom' => 'DSP'])->id,
+            'utilisateur_id' => $utilisateur->id,
+            'reference' => 'REF-2026/001',
+            'objet' => 'POUR MANDATEMENT',
+            'date_bordereau' => '2026-10-10',
+            'num_arrivee' => '001',
+            'date_arrivee' => '2026-10-10',
+        ]);
+
+        Dossier::create([
+            'bordereau_recu_id' => $bordereau->id,
+            'division_id' => $division->id,
+            'agent_id' => Agent::create(['im' => '111222', 'nom' => 'RAKOTO', 'prenoms' => 'Jean'])->id,
+            'type_dossier_id' => $type->id,
+            'responsable_id' => $utilisateur->id,
+            'statut' => StatutDossier::Recu,
+            'pole' => PoleDossier::Solde,
+        ]);
+
+        $this->actingAs($utilisateur)
+            ->get(route('bordereaux.imprimer', $bordereau))
+            ->assertOk()
+            ->assertSee(self::ENTETE[0])
+            ->assertSee(self::ENTETE[1])
+            ->assertDontSee('Service régional de la Solde');
     }
 
     public function test_la_note_soit_transmis_visa_affiche_la_nouvelle_entete_et_reference(): void

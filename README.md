@@ -7,6 +7,17 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Zone de modification de l'en-tête (à retenir)
+
+Les notes « Soit transmis » (Solde et Visa) et les bordereaux d'envoi reprennent tous leur en-tête et leur référence depuis **un seul endroit** : `config/soit_transmis.php`.
+
+- `entete_administration` : les lignes de l'administration émettrice ;
+- `reference_suffixe` : la partie fixe du `N° …` (l'année reste ajoutée automatiquement).
+
+Valeur actuelle : `DIRECTION REGIONALE DU BUDGET ET DES FINANCES AMORON'I MANIA` et `2026/MEF/SG/DGBF/DSP/DRBF.AMM`.
+
+Pour transformer ces textes dans quelques mois ou quelques années, il suffit de modifier ces deux clés. Aucune vue, aucun test ni migration n'est à toucher.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

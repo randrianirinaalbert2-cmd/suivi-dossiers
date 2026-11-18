@@ -123,8 +123,9 @@
     <div class="cachet">
         Arrivée le {{ $bordereau->date_arrivee?->format('d/m/Y') }}<br>
         Sous n° {{ $bordereau->num_arrivee }}<br>
-        Service régional de la Solde<br>
-        et des Pensions Amoron'i Mania
+        @foreach (config('soit_transmis.entete_administration') as $ligne)
+            {{ $ligne }}@if (! $loop->last)<br>@endif
+        @endforeach
     </div>
 
     <div class="note no-print">

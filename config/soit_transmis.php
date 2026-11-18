@@ -9,6 +9,10 @@
 | destinataire (nouvelle personne, nouvelle formule) ou ajouter un intitulé,
 | il suffit de modifier ce fichier : aucune vue n'est à toucher.
 |
+| À retenir pour plus tard (quelques mois ou années) : l'en-tête de
+| l'administration et la référence des documents sont aussi ici, dans les clés
+| 'entete_administration' et 'reference_suffixe' plus bas. Voir le README.
+|
 */
 
 return [

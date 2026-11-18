@@ -38,6 +38,18 @@ npx --yes localtunnel --port 8000 --subdomain srsp-suivi
 
 Elle donne `https://srsp-suivi.loca.lt`, active tant que la commande tourne.
 
+## Apres une modification
+
+Le site public pointe vers le serveur du poste de developpement : il n'y a rien a reinstaller.
+
+- Vue Blade, controleur ou modele : rien a faire, c'est immediat. Au besoin : php artisan view:clear
+- Fichier .env, configuration ou nom de l'application : php artisan config:clear
+- CSS ou JavaScript : npm ci puis npm run build une seule fois, sans lancer Vite. Le fichier public/hot doit rester absent.
+- Migration : php artisan migrate --force, apres accord explicite.
+- Code pris sur GitHub : git pull origin main, puis l'action correspondante ci-dessus.
+
+Si le lien public tombe, relancer la commande localtunnel : le nom srsp-suivi reste le meme.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

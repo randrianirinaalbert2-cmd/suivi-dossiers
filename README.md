@@ -30,6 +30,14 @@ Pour montrer l'application hors du réseau local, un tunnel Cloudflare peut êtr
 
 L'adresse `https://…trycloudflare.com` affichée change à chaque lancement. Le serveur Laravel et le PC doivent rester allumés. Avant toute exposition publique, changer les mots de passe de test et laisser `APP_DEBUG=false`.
 
+Pour obtenir une adresse **lisible et choisie** sans acheter de domaine, localtunnel peut être utilisé :
+
+```powershell
+npx --yes localtunnel --port 8000 --subdomain srsp-suivi
+```
+
+Elle donne `https://srsp-suivi.loca.lt`, active tant que la commande tourne.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

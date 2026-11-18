@@ -71,7 +71,7 @@
             </div>
 
             <!-- Formulaire (droite) -->
-            <div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f0f9ff] px-5 py-10 sm:px-8 lg:h-screen lg:overflow-y-auto">
+            <div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f0f9ff] px-4 py-8 sm:px-6 lg:h-screen lg:overflow-y-auto">
                 <button type="button"
                         x-data="{ sombre: document.documentElement.classList.contains('dark') }"
                         @click="sombre = !sombre; document.documentElement.classList.toggle('dark', sombre); localStorage.setItem('theme', sombre ? 'dark' : 'light')"
@@ -87,61 +87,26 @@
                     <span x-show="!sombre" x-cloak>Sombre</span>
                     <span x-show="sombre" x-cloak>Clair</span>
                 </button>
-                <!-- Fond : halos colorés -->
-                <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(45rem_45rem_at_10%_-10%,rgba(14,165,233,.28),transparent_60%),radial-gradient(40rem_40rem_at_105%_15%,rgba(6,182,212,.24),transparent_55%),radial-gradient(38rem_38rem_at_50%_115%,rgba(34,211,238,.20),transparent_60%)]"></div>
+                <div class="relative z-10 w-full max-w-sm">
 
-                <!-- Fond : trame fine -->
-                <div class="pointer-events-none absolute inset-0 opacity-40"
-                     style="background-image: linear-gradient(rgba(14,165,233,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,.10) 1px, transparent 1px); background-size: 34px 34px; -webkit-mask-image: radial-gradient(circle at 50% 40%, black, transparent 80%); mask-image: radial-gradient(circle at 50% 40%, black, transparent 80%);"></div>
-
-                <!-- Formes flottantes -->
-                <div class="pointer-events-none absolute left-[6%] top-[14%] h-24 w-24 rotate-12 rounded-[2rem] bg-[linear-gradient(135deg,rgba(14,165,233,.45),rgba(6,182,212,.30))] blur-[1px] animate-pulse" style="animation-duration:6s"></div>
-                <div class="pointer-events-none absolute right-[8%] top-[60%] h-16 w-16 -rotate-12 rounded-full bg-[linear-gradient(135deg,rgba(34,211,238,.40),rgba(45,212,191,.30))] blur-[1px] animate-pulse" style="animation-duration:7s"></div>
-                <div class="pointer-events-none absolute bottom-[8%] left-[14%] h-20 w-20 rotate-6 rounded-3xl border-2 border-sky-400/40 animate-pulse" style="animation-duration:8s"></div>
-
-                <div class="relative z-10 w-full max-w-lg">
-
-                    <!-- Marque -->
-                    <div class="mb-6 flex items-center justify-center gap-3">
-                        <span class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/70 bg-[linear-gradient(135deg,#0ea5e9,#06b6d4)] text-white shadow-xl shadow-indigo-500/40 ring-4 ring-white/70">
-                            <x-icon.folder class="h-6 w-6" />
+                    <!-- Marque compacte -->
+                    <div class="mb-4 flex items-center justify-center gap-2">
+                        <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,#0ea5e9,#06b6d4)] text-white shadow-md">
+                            <x-icon.folder class="h-4 w-4" />
                         </span>
-                        <div class="leading-tight">
-                            <span class="block text-base font-bold text-gray-900">Gestion des dossiers, bordereaux</span>
-                            <span class="block text-xs font-medium uppercase tracking-wider text-indigo-500">de Solde et Visas</span>
-                        </div>
+                        <span class="text-sm font-bold text-gray-900">Gestion des dossiers, bordereaux</span>
                     </div>
 
                     <!-- Carte du formulaire -->
-                    <div class="relative">
-                        <div class="pointer-events-none absolute -inset-3 rounded-[2rem] bg-[linear-gradient(135deg,rgba(14,165,233,.35),rgba(6,182,212,.25),rgba(34,211,238,.20))] blur-xl opacity-70"></div>
+                    <div class="relative overflow-hidden rounded-xl border border-white/70 bg-white/90 shadow-xl shadow-sky-950/10 backdrop-blur-xl">
+                        <div class="h-1 bg-[linear-gradient(90deg,#0ea5e9,#06b6d4,#22d3ee)]"></div>
 
-                        <div class="relative overflow-hidden rounded-3xl border border-white/70 bg-white/85 shadow-2xl shadow-sky-950/10 backdrop-blur-xl">
-                            <div class="h-1.5 bg-[linear-gradient(90deg,#0ea5e9,#06b6d4,#22d3ee)]"></div>
-
-                            <div class="p-6 sm:p-8">
-                                {{ $slot }}
-                            </div>
+                        <div class="p-5 sm:p-6">
+                            {{ $slot }}
                         </div>
                     </div>
 
-                    <!-- Barre de confiance -->
-                    <div class="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-gray-500">
-                        <span class="inline-flex items-center gap-1.5">
-                            <svg class="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Z"/><path stroke-linecap="round" stroke-linejoin="round" d="m9 12 2 2 4-4"/></svg>
-                            Connexion sécurisée
-                        </span>
-                        <span class="inline-flex items-center gap-1.5">
-                            <svg class="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><circle cx="12" cy="12" r="8.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5V12l3 1.8"/></svg>
-                            Accès 24h/24
-                        </span>
-                        <span class="inline-flex items-center gap-1.5">
-                            <svg class="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h10"/></svg>
-                            Traçabilité
-                        </span>
-                    </div>
-
-                    <p class="mt-3 text-center text-xs text-gray-400">
+                    <p class="mt-4 text-center text-[11px] text-gray-400">
                         Application interne — accès réservé aux utilisateurs autorisés
                     </p>
                 </div>

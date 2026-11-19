@@ -743,13 +743,27 @@
                             ->sortBy('date_heure_action')
                             ->values();
                         $piecesAvecAgent = $dossier->piecesRecuesAvecAgent();
-                        $evenements = $dossier->historiques
-                            ->whereNotIn('type_action', ['ajout_piece'])
-                            ->values();
+
+                        // L'historique reste trié du plus récent au plus ancien : la
+                        // ligne unique des pièces prend la place de la réception
+                        // la plus récente, sans repousser les actions récentes.
+                        $timeline = [];
+                        $lignePiecesAjoutee = false;
+                        foreach ($dossier->historiques as $evenementTimeline) {
+                            if ($evenementTimeline->type_action === 'ajout_piece') {
+                                if (! $lignePiecesAjoutee && $piecesRecues->isNotEmpty()) {
+                                    $timeline[] = ['type' => 'pieces'];
+                                    $lignePiecesAjoutee = true;
+                                }
+                                continue;
+                            }
+                            $timeline[] = ['type' => 'action', 'evenement' => $evenementTimeline];
+                        }
                     @endphp
 
-                    {{-- Une seule ligne pour toutes les pièces reçues, avec un seul bouton. --}}
-                    @if ($piecesRecues->isNotEmpty())
+                    @forelse ($timeline as $entree)
+                        @if ($entree['type'] === 'pieces')
+                            {{-- Une seule ligne pour toutes les pièces reçues, avec un seul bouton. --}}
                         <li class="px-6 py-3 flex flex-wrap items-center justify-between gap-3 bg-gray-50/60">
                             <div>
                                 <div class="text-sm font-medium text-gray-900">
@@ -809,10 +823,11 @@
                                 </div>
                             </x-modal>
                         </li>
-                    @endif
-
-                    @forelse ($evenements as $evenement)
-                        @php $details = $evenement->detailsTracabilite(); @endphp
+                        @else
+                            @php
+                                $evenement = $entree['evenement'];
+                                $details = $evenement->detailsTracabilite();
+                            @endphp
                         <li class="px-6 py-3 flex flex-wrap items-start justify-between gap-3">
                             <div>
                                 <div class="text-sm font-medium text-gray-900">{{ $details['action'] }}</div>
@@ -944,6 +959,7 @@
                                 </div>
                             </x-modal>
                         </li>
+                        @endif
                     @empty
                         <li class="px-6 py-8 text-center text-gray-400">Aucune action enregistrée.</li>
                     @endforelse

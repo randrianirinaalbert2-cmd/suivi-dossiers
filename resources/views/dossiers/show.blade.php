@@ -460,11 +460,12 @@
                     @endif
 
                     @if (! empty($suite))
-                        <form method="POST" action="{{ route('dossiers.statut', $dossier) }}" class="mt-4 space-y-4">
+                        <form method="POST" action="{{ route('dossiers.statut', $dossier) }}" class="mt-4 space-y-4"
+                              x-data="{ nouveauStatut: @js(old('statut')) }">
                             @csrf
                             <div>
                                 <x-input-label for="statut" value="Nouveau statut" />
-                                <select id="statut" name="statut" required
+                                <select id="statut" name="statut" required x-model="nouveauStatut"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                     @foreach ($suite as $statut)
                                         <option value="{{ $statut->value }}">{{ $statut->label() }}</option>
@@ -487,6 +488,21 @@
                                     </div>
                                     <p class="mt-1 text-xs text-gray-500">Choisissez le mois d’exploitation du dossier (peut être différent du mois d’arrivée).</p>
                                     <x-input-error class="mt-2" :messages="$errors->get('mois_exploitation')" />
+                                </div>
+                            @endif
+
+                            {{-- Le numéro délivré par le visa est obligatoire avant « Traité ». --}}
+                            @if ($dossier->pole === \App\Enums\PoleDossier::Visa)
+                                <div x-show="nouveauStatut === 'traite'" x-cloak>
+                                    <x-input-label for="num_visa_traitement" value="N° de visa (obligatoire pour « Traité »)" />
+                                    <x-text-input id="num_visa_traitement" name="num_visa" type="text"
+                                                  class="mt-1 block w-full"
+                                                  :value="old('num_visa', $dossier->num_visa)" />
+                                    <p class="mt-1 text-xs text-gray-500">
+                                        La date de fin de traitement sera enregistrée automatiquement aujourd'hui,
+                                        date à laquelle le numéro est attribué.
+                                    </p>
+                                    <x-input-error class="mt-2" :messages="$errors->get('num_visa')" />
                                 </div>
                             @endif
 
@@ -801,6 +817,16 @@
                                                     <span class="mx-2 text-gray-400">→</span>
                                                     {{ $details['statut_apres'] ?? '—' }}
                                                 </dd>
+                                            </div>
+                                        @endif
+                                        @if ($details['num_visa'])
+                                            <div>
+                                                <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">N° venu du visa</dt>
+                                                <dd class="mt-1 text-sm font-medium text-gray-900">{{ $details['num_visa'] }}</dd>
+                                            </div>
+                                            <div>
+                                                <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Date de fin de traitement</dt>
+                                                <dd class="mt-1 text-sm text-gray-700">{{ $details['date_fin_traitement'] ?: '—' }}</dd>
                                             </div>
                                         @endif
                                         <div class="sm:col-span-2">

@@ -427,10 +427,24 @@ class DossierController extends Controller
             $regles['mois_exploitation'] = ['nullable', 'date_format:Y-m'];
         }
 
+        // Un dossier du pôle Visa ne peut être déclaré « Traité » sans le
+        // numéro délivré par le visa : c'est ce numéro qui fixe la date de fin
+        // de traitement enregistrée sur le dossier.
+        $numVisaObligatoire = $dossier->pole === PoleDossier::Visa
+            && $request->input('statut') === StatutDossier::Traite->value;
+
+        if ($numVisaObligatoire) {
+            $regles['num_visa'] = ['required', 'string', 'max:20'];
+        }
+
         $donnees = $request->validate(
             $regles,
             [],
-            ['observation' => 'observation', 'mois_exploitation' => 'mois d\'exploitation']
+            [
+                'observation' => 'observation',
+                'mois_exploitation' => 'mois d\'exploitation',
+                'num_visa' => 'numéro de visa',
+            ]
         );
 
         $nouveau = StatutDossier::from($donnees['statut']);
@@ -472,7 +486,21 @@ class DossierController extends Controller
         if ($dossier->utiliseMoisExploitation()) {
             $maj['mois_exploitation'] = ($donnees['mois_exploitation'] ?? null) ?: null;
         }
+        if ($numVisaObligatoire) {
+            $maj['num_visa'] = $donnees['num_visa'];
+            // La date de fin de traitement est celle où le numéro est donné.
+            $maj['date_visa'] = now()->toDateString();
+        }
         $dossier->update($maj);
+
+        $observation = $donnees['observation'] ?? null;
+        if ($numVisaObligatoire) {
+            $observation = trim(
+                ($observation ?: '')
+                .' Numéro de visa : '.$donnees['num_visa']
+                .' — Date de fin de traitement : '.now()->format('d/m/Y').'.'
+            );
+        }
 
         Historique::create([
             'dossier_id' => $dossier->id,
@@ -480,7 +508,7 @@ class DossierController extends Controller
             'type_action' => 'changement_statut',
             'ancien_statut' => $ancien->value,
             'nouveau_statut' => $nouveau->value,
-            'observation' => $donnees['observation'] ?? null,
+            'observation' => $observation,
         ]);
 
         return redirect()

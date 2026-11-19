@@ -82,6 +82,8 @@ class Historique extends Model
             'division' => $utilisateur?->division?->nom ?: '—',
             'statut_avant' => $this->ancien_statut ? StatutDossier::libelle($this->ancien_statut) : null,
             'statut_apres' => $this->nouveau_statut ? StatutDossier::libelle($this->nouveau_statut) : null,
+            'num_visa' => $this->dossier?->num_visa,
+            'date_fin_traitement' => $this->dossier?->date_visa?->format('d/m/Y'),
             'observation' => $this->observation ?: 'Aucune observation enregistrée.',
         ];
     }

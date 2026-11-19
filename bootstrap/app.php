@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EmpecherMiseEnCache;
 use App\Http\Middleware\RestreindreRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -23,6 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RestreindreRole::class,
             'matricule' => 'App\Http\Middleware\ExigerDivisionMatricule',
         ]);
+
+        // Aucune page (connexion comprise) ne doit être conservée par le
+        // navigateur : sinon le bouton « retour » réafficherait une page
+        // connectée après déconnexion, surtout sur téléphone.
+        $middleware->web(append: [EmpecherMiseEnCache::class]);
 
         // Le site peut etre servi derriere un proxy (tunnel HTTPS, Nginx) :
         // sans cela, Laravel croit que la requete est en HTTP et les liens

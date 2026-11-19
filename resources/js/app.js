@@ -105,4 +105,14 @@ Alpine.data('piecesDossier', (config) => ({
     },
 }));
 
+// Sécurité — après déconnexion, le navigateur peut restaurer une page
+// connectée depuis son cache « retour / avant » (bfcache), notamment sur
+// téléphone. On force alors un rechargement : le serveur vérifie la session
+// et redirige vers la connexion.
+window.addEventListener('pageshow', (evenement) => {
+    if (evenement.persisted) {
+        window.location.reload();
+    }
+});
+
 Alpine.start();

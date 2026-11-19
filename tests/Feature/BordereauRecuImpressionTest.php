@@ -87,6 +87,16 @@ class BordereauRecuImpressionTest extends TestCase
             ->assertDontSee('BORDEREAU D\'ENTRÉE', false);
     }
 
+    public function test_la_page_dimpression_propose_le_telechargement_en_pdf(): void
+    {
+        $this->actingAs($this->utilisateur)
+            ->get(route('bordereaux.imprimer', $this->bordereau))
+            ->assertOk()
+            ->assertSee('Télécharger en PDF')
+            ->assertSee('Enregistrer en PDF')
+            ->assertSee('Enregistrer dans Fichiers');
+    }
+
     public function test_la_page_liste_les_dossiers_du_bordereau(): void
     {
         $this->actingAs($this->utilisateur)

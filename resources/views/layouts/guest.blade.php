@@ -12,7 +12,8 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        {{-- Police chargée sans bloquer l'affichage : sur téléphone, un service externe lent ne doit pas retarder la page. --}}
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 
         <!-- Scripts / Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])

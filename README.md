@@ -7,6 +7,12 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Formation
+
+Vous voulez faire vous-même les modifications et le déploiement ? Suivez le
+[guide d'auto-formation en 7 jours](GUIDE_AUTO_FORMATION.md) : un petit exercice par jour,
+avec les commandes exactes à copier.
+
 ## Zone de modification de l'en-tête (à retenir)
 
 Les notes « Soit transmis » (Solde et Visa) et les bordereaux d'envoi reprennent tous leur en-tête et leur référence depuis **un seul endroit** : `config/soit_transmis.php`.

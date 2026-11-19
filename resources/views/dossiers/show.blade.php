@@ -716,9 +716,10 @@
                 </div>
                 <ul class="divide-y divide-gray-100">
                     @forelse ($dossier->historiques as $evenement)
+                        @php $details = $evenement->detailsTracabilite(); @endphp
                         <li class="px-6 py-3 flex flex-wrap items-start justify-between gap-3">
                             <div>
-                                <div class="text-sm font-medium text-gray-900">{{ $evenement->libelleAction() }}</div>
+                                <div class="text-sm font-medium text-gray-900">{{ $details['action'] }}</div>
                                 @if ($evenement->observation)
                                     <div class="text-xs text-gray-500">{{ $evenement->observation }}</div>
                                 @endif
@@ -731,9 +732,96 @@
                                 @endif
                             </div>
                             <div class="text-right text-xs text-gray-500">
-                                <div>{{ $evenement->utilisateur?->nom }}</div>
+                                <div>{{ $details['agent'] }}</div>
                                 <div>{{ $evenement->date_heure_action?->format('d/m/Y à H:i') }}</div>
+                                <button type="button"
+                                        x-on:click="$dispatch('open-modal', 'detail-action-{{ $evenement->id }}')"
+                                        class="mt-1 inline-flex items-center gap-1 rounded font-semibold text-indigo-600 transition hover:text-indigo-800 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75 9.75 6.75 9.75 6.75-3.75 6.75-9.75 6.75S2.25 12 2.25 12Z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                    Voir les détails
+                                </button>
                             </div>
+
+                            {{-- Traçabilité complète de l'action --}}
+                            <x-modal name="detail-action-{{ $evenement->id }}" maxWidth="lg">
+                                <div class="p-6">
+                                    <div class="flex items-start justify-between gap-4">
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-gray-900">Détails de l'action</h3>
+                                            <p class="mt-1 text-xs text-gray-500">
+                                                Dossier #{{ $dossier->id }} · {{ $dossier->agent?->nomComplet() }}
+                                            </p>
+                                        </div>
+                                        <button type="button"
+                                                x-on:click="$dispatch('close-modal', 'detail-action-{{ $evenement->id }}')"
+                                                class="shrink-0 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <dl class="mt-5 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+                                        <div class="sm:col-span-2">
+                                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Action</dt>
+                                            <dd class="mt-1 text-sm font-medium text-gray-900">{{ $details['action'] }}</dd>
+                                        </div>
+                                        <div>
+                                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Date et heure</dt>
+                                            <dd class="mt-1 text-sm text-gray-700">{{ $details['date_heure'] }}</dd>
+                                        </div>
+                                        <div>
+                                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">N° d'enregistrement</dt>
+                                            <dd class="mt-1 text-sm text-gray-700">#{{ $details['identifiant'] }}</dd>
+                                        </div>
+                                        <div class="sm:col-span-2">
+                                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Agent</dt>
+                                            <dd class="mt-1 text-sm text-gray-900">{{ $details['agent'] }}</dd>
+                                        </div>
+                                        <div>
+                                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Rôle</dt>
+                                            <dd class="mt-1 text-sm text-gray-700">{{ $details['role'] }}</dd>
+                                        </div>
+                                        <div>
+                                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Division</dt>
+                                            <dd class="mt-1 text-sm text-gray-700">{{ $details['division'] }}</dd>
+                                        </div>
+                                        <div class="sm:col-span-2">
+                                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Courriel</dt>
+                                            <dd class="mt-1 text-sm text-gray-700">{{ $details['courriel'] }}</dd>
+                                        </div>
+                                        @if ($details['statut_avant'] || $details['statut_apres'])
+                                            <div class="sm:col-span-2">
+                                                <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Statut</dt>
+                                                <dd class="mt-1 text-sm text-gray-900">
+                                                    {{ $details['statut_avant'] ?? '—' }}
+                                                    <span class="mx-2 text-gray-400">→</span>
+                                                    {{ $details['statut_apres'] ?? '—' }}
+                                                </dd>
+                                            </div>
+                                        @endif
+                                        <div class="sm:col-span-2">
+                                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Observation</dt>
+                                            <dd class="mt-1 whitespace-pre-line rounded-lg bg-gray-50 p-3 text-sm text-gray-700">{{ $details['observation'] }}</dd>
+                                        </div>
+                                        <div class="sm:col-span-2">
+                                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Code de l'action</dt>
+                                            <dd class="mt-1 text-xs text-gray-400">{{ $details['type_action'] }}</dd>
+                                        </div>
+                                    </dl>
+
+                                    <div class="mt-6 flex justify-end">
+                                        <button type="button"
+                                                x-on:click="$dispatch('close-modal', 'detail-action-{{ $evenement->id }}')"
+                                                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            Fermer
+                                        </button>
+                                    </div>
+                                </div>
+                            </x-modal>
                         </li>
                     @empty
                         <li class="px-6 py-8 text-center text-gray-400">Aucune action enregistrée.</li>

@@ -479,6 +479,23 @@ class DossierController extends Controller
 
         $ancien = $dossier->statut;
 
+        // « Vérifié » et « Traité » attestent que les pièces ont été contrôlées.
+        // Sans cette garde, un dossier peut atteindre « Traité » alors qu'aucune
+        // pièce n'a été reçue (données importées ou page restée ouverte).
+        $etapeVerification = ($ancien === StatutDossier::EnTraitement && $nouveau === StatutDossier::Verifie)
+            || ($ancien === StatutDossier::Verifie && $nouveau === StatutDossier::Traite);
+
+        if ($etapeVerification && ! $dossier->estComplet()) {
+            $completude = $dossier->completude();
+
+            return back()->with(
+                'erreur',
+                'Toutes les pièces exigées ne sont pas encore reçues ('
+                .$completude['recues'].'/'.$completude['exigees']
+                .') : vérification des pièces impossible.'
+            );
+        }
+
         $maj = [
             'statut' => $nouveau,
             'observation' => $donnees['observation'] ?? $dossier->observation,

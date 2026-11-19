@@ -117,6 +117,39 @@ class DossierNumeroVisaTraitementTest extends TestCase
             ->assertSee('VIS-2026-118');
     }
 
+    public function test_la_transmission_au_solde_recopie_le_numero_deja_enregistre(): void
+    {
+        $dossier = $this->dossier();
+
+        $this->actingAs($this->utilisateur)
+            ->post(route('dossiers.statut', $dossier), [
+                'statut' => 'traite',
+                'num_visa' => 'VIS-2026-118',
+            ])
+            ->assertRedirect(route('dossiers.show', $dossier));
+
+        // Le formulaire Visa affiche le numéro en lecture seule.
+        $this->actingAs($this->utilisateur)
+            ->get(route('dossiers.show', $dossier))
+            ->assertOk()
+            ->assertSee('N° de visa (enregistré)')
+            ->assertSee('Date de fin de traitement')
+            ->assertSee('VIS-2026-118');
+
+        $dateAttendue = now()->toDateString();
+
+        $this->actingAs($this->utilisateur)
+            ->post(route('dossiers.transmettre-solde', $dossier), [
+                'num_visa' => 'AUTRE-999',
+                'date_visa' => '2000-01-01',
+            ])
+            ->assertRedirect(route('dossiers.show', $dossier));
+
+        $dossier->refresh();
+        $this->assertSame('VIS-2026-118', $dossier->num_visa);
+        $this->assertSame($dateAttendue, $dossier->date_visa->toDateString());
+    }
+
     public function test_un_dossier_du_pole_solde_reste_traitable_sans_numero_de_visa(): void
     {
         $dossier = $this->dossier([

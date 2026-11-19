@@ -71,11 +71,13 @@ class DossierVisaTest extends TestCase
     public function test_le_dossier_au_visa_peut_etre_transmis_au_solde(): void
     {
         $dossier = $this->dossier();
+        $dossier->update([
+            'num_visa' => 'VIS-2026-001',
+            'date_visa' => '2026-10-15',
+        ]);
 
         $this->actingAs($this->utilisateur)
             ->post(route('dossiers.transmettre-solde', $dossier), [
-                'num_visa' => 'VIS-2026-001',
-                'date_visa' => '2026-10-15',
                 'reference_acte' => 'ARR-2026-77',
             ])
             ->assertRedirect(route('dossiers.show', $dossier));
@@ -92,17 +94,19 @@ class DossierVisaTest extends TestCase
             'dossier_id' => $dossier->id,
             'utilisateur_id' => $this->utilisateur->id,
             'type_action' => 'visa',
+            'observation' => 'Contrôle du visa effectué : dossier transmis au pôle Solde. Numéro repris : VIS-2026-001.',
         ]);
     }
 
-    public function test_la_date_de_visa_par_defaut_est_aujourd_hui(): void
+    public function test_la_transmission_ne_recalcule_pas_la_date_de_fin_de_traitement(): void
     {
         $dossier = $this->dossier();
+        $dossier->update(['date_visa' => '2026-10-15']);
 
         $this->actingAs($this->utilisateur)
             ->post(route('dossiers.transmettre-solde', $dossier));
 
-        $this->assertSame(now()->toDateString(), $dossier->refresh()->date_visa->toDateString());
+        $this->assertSame('2026-10-15', $dossier->refresh()->date_visa->toDateString());
     }
 
     public function test_un_dossier_deja_au_solde_ne_peut_pas_etre_revise(): void

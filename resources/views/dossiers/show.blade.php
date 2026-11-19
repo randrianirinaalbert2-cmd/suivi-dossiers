@@ -554,16 +554,22 @@
                     <form method="POST" action="{{ route('dossiers.transmettre-solde', $dossier) }}" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                         @csrf
                         <div>
-                            <x-input-label for="num_visa" value="N° de visa" />
-                            <x-text-input id="num_visa" name="num_visa" type="text" class="mt-1 block w-full"
-                                          :value="old('num_visa', $dossier->num_visa)" />
-                            <x-input-error class="mt-2" :messages="$errors->get('num_visa')" />
+                            <x-input-label for="num_visa_affiche" value="N° de visa (enregistré)" />
+                            <div id="num_visa_affiche"
+                                 class="mt-1 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                                {{ $dossier->num_visa ?: 'Non enregistré' }}
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">
+                                Numéro reçu avant le statut « Traité » ; repris automatiquement ici.
+                            </p>
                         </div>
                         <div>
-                            <x-input-label for="date_visa" value="Date du visa" />
-                            <x-text-input id="date_visa" name="date_visa" type="date" class="mt-1 block w-full"
-                                          :value="old('date_visa', $dossier->date_visa?->format('Y-m-d') ?? now()->toDateString())" />
-                            <x-input-error class="mt-2" :messages="$errors->get('date_visa')" />
+                            <x-input-label for="date_visa_affiche" value="Date de fin de traitement" />
+                            <div id="date_visa_affiche"
+                                 class="mt-1 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                                {{ $dossier->date_visa?->format('d/m/Y') ?: '—' }}
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Date à laquelle le numéro a été attribué.</p>
                         </div>
                         <div>
                             <x-input-label for="reference_acte" value="Référence de l'acte" />

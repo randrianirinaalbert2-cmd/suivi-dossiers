@@ -541,22 +541,19 @@ class DossierController extends Controller
         }
 
         $donnees = $request->validate([
-            'num_visa' => ['nullable', 'string', 'max:20'],
-            'date_visa' => ['nullable', 'date'],
             'reference_acte' => ['nullable', 'string', 'max:60'],
             'observation' => ['nullable', 'string', 'max:1000'],
         ], [], [
-            'num_visa' => 'numéro de visa',
-            'date_visa' => 'date du visa',
             'reference_acte' => "référence de l'acte",
             'observation' => 'observation',
         ]);
 
+        // Le numéro et la date de fin de traitement ont déjà été enregistrés
+        // au passage au statut « Traité » : la transmission se contente de
+        // les reprendre, elle ne les ressaisit pas.
         $dossier->update([
             'pole' => PoleDossier::Solde,
             'passe_par_visa' => true,
-            'num_visa' => ($donnees['num_visa'] ?? null) ?: $dossier->num_visa,
-            'date_visa' => ($donnees['date_visa'] ?? null) ?: ($dossier->date_visa?->toDateString() ?? now()->toDateString()),
             'reference_acte' => ($donnees['reference_acte'] ?? null) ?: $dossier->reference_acte,
         ]);
 
@@ -569,6 +566,7 @@ class DossierController extends Controller
             'ancien_statut' => $dossier->statut->value,
             'nouveau_statut' => $dossier->statut->value,
             'observation' => 'Contrôle du visa effectué : dossier transmis au pôle Solde.'
+                .($dossier->num_visa ? ' Numéro repris : '.$dossier->num_visa.'.' : '')
                 .(! empty($observation) ? ' — '.$observation : ''),
         ]);
 

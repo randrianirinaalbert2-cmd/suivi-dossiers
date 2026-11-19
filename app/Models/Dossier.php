@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Dossier extends ModeleBase
 {
@@ -167,6 +168,29 @@ class Dossier extends ModeleBase
     public function historiques(): HasMany
     {
         return $this->hasMany(Historique::class)->orderByDesc('date_heure_action');
+    }
+
+    /**
+     * Pièces reçues pour ce dossier, avec la personne qui les a prises.
+     *
+     * La table pieces_recues ne conservant pas d'utilisateur, l'agent est
+     * déduit des actions « ajout_piece » de l'historique.
+     *
+     * @return array<int, array{piece: string, agent: string, role: string, date: string}>
+     */
+    public function piecesRecuesAvecAgent(): array
+    {
+        return $this->historiques
+            ->where('type_action', 'ajout_piece')
+            ->sortBy('date_heure_action')
+            ->map(fn (Historique $action): array => [
+                'piece' => Str::after($action->observation ?: '', 'Pièce : '),
+                'agent' => $action->utilisateur?->nom ?: 'Utilisateur supprimé',
+                'role' => $action->utilisateur?->role?->label() ?: '—',
+                'date' => $action->date_heure_action?->format('d/m/Y à H:i') ?: '—',
+            ])
+            ->values()
+            ->all();
     }
 
     /**

@@ -65,7 +65,7 @@ class Historique extends Model
      * Toutes les informations de traçabilité affichées par le bouton
      * « Voir les détails » de l'historique d'un dossier.
      *
-     * @return array<string, string|null>
+     * @return array<string, mixed>
      */
     public function detailsTracabilite(): array
     {
@@ -85,6 +85,7 @@ class Historique extends Model
             'num_visa' => $this->dossier?->num_visa,
             'date_fin_traitement' => $this->dossier?->date_visa?->format('d/m/Y'),
             'observation' => $this->observation ?: 'Aucune observation enregistrée.',
+            'pieces_prises' => $this->dossier?->piecesRecuesAvecAgent() ?? [],
         ];
     }
 }

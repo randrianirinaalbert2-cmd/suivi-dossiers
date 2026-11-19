@@ -737,7 +737,81 @@
                     <h3 class="text-sm font-semibold text-gray-800 uppercase tracking-wide">Historique des actions</h3>
                 </div>
                 <ul class="divide-y divide-gray-100">
-                    @forelse ($dossier->historiques as $evenement)
+                    @php
+                        $piecesRecues = $dossier->historiques
+                            ->where('type_action', 'ajout_piece')
+                            ->sortBy('date_heure_action')
+                            ->values();
+                        $piecesAvecAgent = $dossier->piecesRecuesAvecAgent();
+                        $evenements = $dossier->historiques
+                            ->whereNotIn('type_action', ['ajout_piece'])
+                            ->values();
+                    @endphp
+
+                    {{-- Une seule ligne pour toutes les pièces reçues, avec un seul bouton. --}}
+                    @if ($piecesRecues->isNotEmpty())
+                        <li class="px-6 py-3 flex flex-wrap items-center justify-between gap-3 bg-gray-50/60">
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">
+                                    Pièces réceptionnées
+                                    <span class="ms-1 inline-flex items-center rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-700">
+                                        {{ $piecesRecues->count() }}
+                                    </span>
+                                </div>
+                                <div class="mt-1 text-xs text-gray-500">
+                                    {{ $piecesRecues->first()?->utilisateur?->nom ?: 'Utilisateur supprimé' }}
+                                    · du {{ $piecesRecues->first()?->date_heure_action?->format('d/m/Y') }}
+                                    au {{ $piecesRecues->last()?->date_heure_action?->format('d/m/Y') }}
+                                </div>
+                            </div>
+                            <button type="button"
+                                    x-on:click="$dispatch('open-modal', 'detail-pieces-recues')"
+                                    class="inline-flex items-center gap-1 rounded font-semibold text-indigo-600 transition hover:text-indigo-800 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75 9.75 6.75 9.75 6.75-3.75 6.75-9.75 6.75S2.25 12 2.25 12Z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                Voir les détails
+                            </button>
+
+                            <x-modal name="detail-pieces-recues" maxWidth="lg">
+                                <div class="p-6">
+                                    <div class="flex items-start justify-between gap-4">
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-gray-900">Pièces réceptionnées</h3>
+                                            <p class="mt-1 text-xs text-gray-500">
+                                                Dossier #{{ $dossier->id }} · {{ $dossier->agent?->nomComplet() }}
+                                            </p>
+                                        </div>
+                                        <button type="button"
+                                                x-on:click="$dispatch('close-modal', 'detail-pieces-recues')"
+                                                class="shrink-0 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <div class="mt-5">
+                                        <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Qui a pris les pièces reçues</dt>
+                                        <dd class="mt-1">
+                                            @include('dossiers.partials.pieces-recues-liste', ['piecesRecues' => $piecesAvecAgent])
+                                        </dd>
+                                    </div>
+
+                                    <div class="mt-6 flex justify-end">
+                                        <button type="button"
+                                                x-on:click="$dispatch('close-modal', 'detail-pieces-recues')"
+                                                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            Fermer
+                                        </button>
+                                    </div>
+                                </div>
+                            </x-modal>
+                        </li>
+                    @endif
+
+                    @forelse ($evenements as $evenement)
                         @php $details = $evenement->detailsTracabilite(); @endphp
                         <li class="px-6 py-3 flex flex-wrap items-start justify-between gap-3">
                             <div>
@@ -833,6 +907,21 @@
                                             <div>
                                                 <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Date de fin de traitement</dt>
                                                 <dd class="mt-1 text-sm text-gray-700">{{ $details['date_fin_traitement'] ?: '—' }}</dd>
+                                            </div>
+                                        @endif
+                                        @if (in_array($evenement->nouveau_statut, ['rejete', 'incomplet'], true))
+                                            <div class="sm:col-span-2">
+                                                <p class="rounded-lg bg-amber-50 p-3 text-xs text-amber-800">
+                                                    Dossier déclaré <strong>{{ $details['statut_apres'] }}</strong> : voici qui a pris les pièces reçues.
+                                                </p>
+                                            </div>
+                                        @endif
+                                        @if (! empty($details['pieces_prises']))
+                                            <div class="sm:col-span-2">
+                                                <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Qui a pris les pièces reçues</dt>
+                                                <dd class="mt-1">
+                                                    @include('dossiers.partials.pieces-recues-liste', ['piecesRecues' => $details['pieces_prises']])
+                                                </dd>
                                             </div>
                                         @endif
                                         <div class="sm:col-span-2">

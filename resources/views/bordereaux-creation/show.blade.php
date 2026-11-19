@@ -142,7 +142,7 @@
                 <div class="px-6 py-4 border-b border-gray-100">
                     <h3 class="text-sm font-semibold text-gray-800 uppercase tracking-wide">Liste des agents transmis</h3>
                 </div>
-                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-sm min-w-[640px]">
                     <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                         <tr>
                             <th class="px-6 py-3 w-12">N°</th>
@@ -165,7 +165,7 @@
                             <tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">Aucune ligne.</td></tr>
                         @endforelse
                     </tbody>
-                </table>
+                </table></div>
             </div>
         </div>
     </div>

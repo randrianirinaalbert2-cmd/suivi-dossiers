@@ -100,7 +100,7 @@
                     <div class="text-xs text-gray-500">Dossiers arrivés / enregistrés selon les filtres</div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm min-w-[640px]">
                         <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                             <tr>
                                 <th class="px-6 py-3">Code</th>

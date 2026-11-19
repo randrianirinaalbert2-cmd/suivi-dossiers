@@ -39,7 +39,7 @@
                     <a href="{{ route('types-dossiers.edit', $typeDossier) }}" class="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800"><x-icon.pencil class="h-4 w-4" />Modifier le type</a>
                 </div>
 
-                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-sm min-w-[640px]">
                     <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                         <tr>
                             <th class="px-6 py-3">Pièce</th>
@@ -88,7 +88,7 @@
                             <tr><td colspan="3" class="px-6 py-8 text-center text-gray-400">Aucune pièce exigée pour ce type de dossier.</td></tr>
                         @endforelse
                     </tbody>
-                </table>
+                </table></div>
             </div>
 
             @if ($typesPiecesDisponibles->isNotEmpty())

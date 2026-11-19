@@ -101,6 +101,16 @@
 
                 <div class="relative z-10 w-full max-w-lg">
 
+                    <!-- Identité SRSP.AMM sur téléphone -->
+                    <div class="mb-4 flex items-center justify-center gap-2 rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 shadow-sm lg:hidden">
+                        <img src="{{ asset('logo-mef.png') }}" alt="Armoiries — Ministère de l'Économie et des Finances"
+                             class="h-10 w-10 shrink-0 rounded-full bg-white p-1 shadow ring-1 ring-slate-200">
+                        <div class="leading-tight">
+                            <span class="block text-sm font-bold text-slate-800">SRSP.AMM</span>
+                            <span class="block text-[11px] text-slate-500">Service Régional de la Solde et des Pensions</span>
+                        </div>
+                    </div>
+
                     <!-- Marque -->
                     <div class="mb-6 flex items-center justify-center gap-3">
                         <span class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/70 bg-[linear-gradient(135deg,#3f7fa6,#2b6b8e)] text-white shadow-md shadow-slate-900/10 ring-4 ring-white/60">

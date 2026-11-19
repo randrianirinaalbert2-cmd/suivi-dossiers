@@ -16,7 +16,7 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-sm min-w-[640px]">
                     <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                         <tr>
                             <th class="px-6 py-3">Nom de la destination</th>
@@ -43,7 +43,7 @@
                             <tr><td colspan="3" class="px-6 py-8 text-center text-gray-400">Aucune destination.</td></tr>
                         @endforelse
                     </tbody>
-                </table>
+                </table></div>
                 <div class="px-6 py-3 border-t border-gray-100">{{ $destinations->links() }}</div>
             </div>
         </div>

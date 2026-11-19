@@ -27,7 +27,7 @@
             </form>
 
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-sm min-w-[640px]">
                     <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                         <tr>
                             <th class="px-6 py-3">Nom</th>
@@ -72,7 +72,7 @@
                             <tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">Aucun utilisateur.</td></tr>
                         @endforelse
                     </tbody>
-                </table>
+                </table></div>
                 <div class="px-6 py-3 border-t border-gray-100">{{ $utilisateurs->links() }}</div>
             </div>
         </div>

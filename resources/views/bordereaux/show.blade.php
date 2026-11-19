@@ -172,7 +172,7 @@
                         </a>
                     </div>
                 </div>
-                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-sm min-w-[640px]">
                     <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                         <tr>
                             <th class="px-6 py-3">Agent</th>
@@ -198,7 +198,7 @@
                             <tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">Aucun dossier rattaché à ce bordereau.</td></tr>
                         @endforelse
                     </tbody>
-                </table>
+                </table></div>
             </div>
 
             <x-documents :documents="$bordereau->documents->sortByDesc('date_numerisation')->values()"

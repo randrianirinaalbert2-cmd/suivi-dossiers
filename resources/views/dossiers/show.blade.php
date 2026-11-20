@@ -319,7 +319,9 @@
                         </div>
                         @if ($dossier->observation)
                             <div class="sm:col-span-2">
-                                <dt class="text-xs font-semibold uppercase text-gray-400">Observation</dt>
+                                <dt class="text-xs font-semibold uppercase text-gray-400">
+                                    {{ in_array($dossier->statut, [\App\Enums\StatutDossier::Rejete, \App\Enums\StatutDossier::Incomplet], true) ? 'Motif de rejet' : 'Observation' }}
+                                </dt>
                                 <dd class="mt-1 text-gray-900 whitespace-pre-line">{{ $dossier->observation }}</dd>
                             </div>
                         @endif
@@ -511,6 +513,44 @@
                                 </div>
                             @endif
 
+                            {{-- Rejet / incomplet : le motif est obligatoire et peut être précisé librement. --}}
+                            <div id="bloc-motif-rejet" hidden
+                                 class="space-y-4 rounded-lg border border-rose-200 bg-rose-50/60 p-4">
+                                <div>
+                                    <x-input-label for="motif_rejet" value="Motif de rejet (obligatoire)" />
+                                    <select id="motif_rejet" name="motif_rejet"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                        <option value="">— Choisir un motif —</option>
+                                        @foreach ($motifsRejet as $motif)
+                                            <option value="{{ $motif->value }}" data-aide="{{ $motif->aide() }}" @selected(old('motif_rejet') === $motif->value)>{{ $motif->label() }}</option>
+                                        @endforeach
+                                    </select>
+                                    <p id="aide-motif-rejet" class="mt-1 text-xs text-gray-500">Choisissez le motif qui correspond le mieux au rejet.</p>
+                                    <x-input-error class="mt-2" :messages="$errors->get('motif_rejet')" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="detail_motif" value="Précision (ex. numéro de compte incomplet)" />
+                                    <textarea id="detail_motif" name="detail_motif" rows="2"
+                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                              placeholder="Précisez ce qui est incomplet ou non conforme…">{{ old('detail_motif') }}</textarea>
+                                    <p class="mt-1 text-xs text-gray-500">Facultatif, sauf pour « Autre motif » où la précision est obligatoire.</p>
+                                    <x-input-error class="mt-2" :messages="$errors->get('detail_motif')" />
+                                </div>
+
+                                @if (! empty($piecesManquantes))
+                                    <div id="liste-pieces-manquantes" hidden>
+                                        <p class="text-xs font-semibold uppercase text-gray-500">Pièces actuellement manquantes</p>
+                                        <ul class="mt-1 list-disc space-y-0.5 pl-5 text-xs text-gray-600">
+                                            @foreach ($piecesManquantes as $pieceManquante)
+                                                <li>{{ $pieceManquante }}</li>
+                                            @endforeach
+                                        </ul>
+                                        <p class="mt-1 text-xs text-gray-400">Cette liste sera jointe automatiquement au motif enregistré.</p>
+                                    </div>
+                                @endif
+                            </div>
+
                             <div>
                                 <x-input-label for="observation" value="Observation (facultative)" />
                                 <textarea id="observation" name="observation" rows="3"
@@ -526,6 +566,48 @@
                                 Valider le changement
                             </x-primary-button>
                         </form>
+
+                        {{-- Affichage du motif : JavaScript natif pour rester fiable sur mobile comme sur PC. --}}
+                        <script>
+                            (() => {
+                                const form = document.querySelector('form[action*="/statut"]');
+                                const statut = form?.querySelector('select[name="statut"]');
+                                const motif = form?.querySelector('select[name="motif_rejet"]');
+                                if (!statut || !motif) {
+                                    return;
+                                }
+
+                                const bloc = form.querySelector('#bloc-motif-rejet');
+                                const detail = form.querySelector('#detail_motif');
+                                const aide = form.querySelector('#aide-motif-rejet');
+                                const liste = form.querySelector('#liste-pieces-manquantes');
+
+                                const mettreAJour = () => {
+                                    const estRejet = statut.value === 'rejete' || statut.value === 'incomplet';
+
+                                    bloc.hidden = !estRejet;
+                                    bloc.style.display = estRejet ? '' : 'none';
+                                    motif.required = estRejet;
+                                    if (detail) {
+                                        detail.required = estRejet && motif.value === 'autre';
+                                    }
+
+                                    const option = motif.selectedOptions[0];
+                                    if (aide) {
+                                        aide.textContent = option?.dataset.aide || 'Choisissez le motif qui correspond le mieux au rejet.';
+                                    }
+
+                                    if (liste) {
+                                        liste.hidden = motif.value !== 'pieces_manquantes';
+                                        liste.style.display = motif.value === 'pieces_manquantes' ? '' : 'none';
+                                    }
+                                };
+
+                                statut.addEventListener('change', mettreAJour);
+                                motif.addEventListener('change', mettreAJour);
+                                mettreAJour();
+                            })();
+                        </script>
 
                         <div class="mt-4 text-xs text-gray-400">
                             Statut actuel : <strong>{{ $dossier->statut->label() }}</strong>

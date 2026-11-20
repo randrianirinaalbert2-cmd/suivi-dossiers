@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MotifRejet;
 use App\Enums\PoleDossier;
 use App\Enums\RoleUtilisateur;
 use App\Enums\StatutDossier;
@@ -197,6 +198,8 @@ class DossierController extends Controller
             'completude' => $dossier->completude(),
             'piecesExigees' => $dossier->piecesExigees(),
             'piecesRecues' => $dossier->piecesRecues->keyBy('type_piece_id'),
+            'piecesManquantes' => $dossier->piecesManquantes(),
+            'motifsRejet' => MotifRejet::cases(),
             'suite' => $this->statutsPermis($request->user(), $dossier),
             'suiteBloquee' => $dossier->statut->suite() !== []
                 && $this->statutsPermis($request->user(), $dossier) === [],
@@ -426,6 +429,25 @@ class DossierController extends Controller
             'observation' => ['nullable', 'string', 'max:1000'],
         ];
 
+        // Un rejet (ou un dossier déclaré incomplet) doit toujours être
+        // justifié : on distingue les pièces manquantes d'une pièce présente
+        // mais incomplète ou non conforme, avec une précision libre.
+        $avecMotif = in_array(
+            $request->input('statut'),
+            [StatutDossier::Rejete->value, StatutDossier::Incomplet->value],
+            true
+        );
+
+        if ($avecMotif) {
+            $regles['motif_rejet'] = ['required', 'in:'.implode(',', MotifRejet::valeurs())];
+            $regles['detail_motif'] = [
+                'nullable',
+                'string',
+                'max:500',
+                'required_if:motif_rejet,'.MotifRejet::Autre->value,
+            ];
+        }
+
         // Le mois d'exploitation n'existe que pour le pôle Solde : pour un
         // dossier encore au Visa, la valeur éventuellement envoyée est ignorée.
         if ($dossier->utiliseMoisExploitation()) {
@@ -447,6 +469,8 @@ class DossierController extends Controller
             [],
             [
                 'observation' => 'observation',
+                'motif_rejet' => 'motif de rejet',
+                'detail_motif' => 'précision du motif',
                 'mois_exploitation' => 'mois d\'exploitation',
                 'num_visa' => 'numéro de visa',
             ]
@@ -499,6 +523,27 @@ class DossierController extends Controller
                 .$completude['recues'].'/'.$completude['exigees']
                 .') : vérification des pièces impossible.'
             );
+        }
+
+        // Le motif est figé dans l'observation : aucun champ supplémentaire
+        // en base, mais une trace lisible sur la fiche et dans l'historique.
+        if ($avecMotif) {
+            $motif = MotifRejet::from($donnees['motif_rejet']);
+            $texteMotif = 'Motif de rejet : '.$motif->label().'.';
+
+            $detail = trim($donnees['detail_motif'] ?? '');
+            if ($detail !== '') {
+                $texteMotif .= ' Précision : '.$detail.'.';
+            }
+
+            if ($motif === MotifRejet::PiecesManquantes) {
+                $manquantes = $dossier->piecesManquantes();
+                if ($manquantes !== []) {
+                    $texteMotif .= ' Pièces manquantes : '.implode(', ', $manquantes).'.';
+                }
+            }
+
+            $donnees['observation'] = trim($texteMotif.' '.($donnees['observation'] ?? ''));
         }
 
         $maj = [

@@ -317,6 +317,27 @@ class Dossier extends ModeleBase
     }
 
     /**
+     * Libellés des pièces exigées qui ne sont pas encore reçues.
+     *
+     * Cette liste est recalculée à chaque appel : elle sert à renseigner
+     * automatiquement le motif de rejet « Pièces manquantes » sans figer
+     * de donnée supplémentaire en base.
+     *
+     * @return array<int, string>
+     */
+    public function piecesManquantes(): array
+    {
+        $recues = $this->piecesRecues()->pluck('type_piece_id')->all();
+
+        return $this->piecesExigees()
+            ->reject(fn (PieceRequise $piece) => in_array($piece->type_piece_id, $recues, true))
+            ->map(fn (PieceRequise $piece) => $piece->typePiece?->libelle)
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    /**
      * La situation de l'agent doit-elle être confirmée pour ce dossier ?
      */
     public function situationAConfirmer(): bool

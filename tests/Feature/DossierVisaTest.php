@@ -77,9 +77,7 @@ class DossierVisaTest extends TestCase
         ]);
 
         $this->actingAs($this->utilisateur)
-            ->post(route('dossiers.transmettre-solde', $dossier), [
-                'reference_acte' => 'ARR-2026-77',
-            ])
+            ->post(route('dossiers.transmettre-solde', $dossier))
             ->assertRedirect(route('dossiers.show', $dossier));
 
         $dossier->refresh();
@@ -88,7 +86,7 @@ class DossierVisaTest extends TestCase
         $this->assertTrue($dossier->passe_par_visa);
         $this->assertSame('VIS-2026-001', $dossier->num_visa);
         $this->assertSame('2026-10-15', $dossier->date_visa->toDateString());
-        $this->assertSame('ARR-2026-77', $dossier->reference_acte);
+        $this->assertNull($dossier->reference_acte);
 
         $this->assertDatabaseHas('historiques', [
             'dossier_id' => $dossier->id,
@@ -123,5 +121,53 @@ class DossierVisaTest extends TestCase
             'dossier_id' => $dossier->id,
             'type_action' => 'visa',
         ]);
+    }
+
+    public function test_la_fiche_visa_ne_montre_pas_la_reference_de_lacte(): void
+    {
+        $dossier = $this->dossier();
+
+        $this->actingAs($this->utilisateur)
+            ->get(route('dossiers.show', $dossier))
+            ->assertOk()
+            ->assertSee('Références visa')
+            ->assertDontSee('Réf. acte')
+            ->assertDontSee('name="reference_acte"', false);
+    }
+
+    public function test_le_formulaire_visa_ne_propose_pas_la_reference_de_lacte(): void
+    {
+        $dossier = $this->dossier();
+
+        $this->actingAs($this->utilisateur)
+            ->get(route('dossiers.create', ['bordereau_recu_id' => $dossier->bordereau_recu_id]))
+            ->assertOk()
+            ->assertSee('Références du visa')
+            ->assertDontSee('name="reference_acte"', false);
+    }
+
+    public function test_un_dossier_visa_ignore_la_reference_dacte_meme_si_envoyee(): void
+    {
+        $existant = $this->dossier();
+        $agent = Agent::create([
+            'im' => '333444',
+            'nom' => 'RANDRIA',
+            'prenoms' => 'Hery',
+        ]);
+
+        $this->actingAs($this->utilisateur)
+            ->post(route('dossiers.store'), [
+                'bordereau_recu_id' => $existant->bordereau_recu_id,
+                'agent_id' => $agent->id,
+                'type_dossier_id' => $existant->type_dossier_id,
+                'pole' => PoleDossier::Visa->value,
+                'reference_acte' => 'ARR-2026-77',
+            ])
+            ->assertRedirect();
+
+        $cree = Dossier::where('agent_id', $agent->id)->firstOrFail();
+
+        $this->assertSame(PoleDossier::Visa, $cree->pole);
+        $this->assertNull($cree->reference_acte);
     }
 }

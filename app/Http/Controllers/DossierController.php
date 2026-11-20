@@ -113,7 +113,12 @@ class DossierController extends Controller
         }
 
         return view('dossiers.form', [
-            'dossier' => new Dossier(['statut' => StatutDossier::Recu]),
+            'dossier' => new Dossier([
+                'statut' => StatutDossier::Recu,
+                'pole' => $bordereau !== null
+                    ? $this->poleDeLaDivision($bordereau->division_id)
+                    : PoleDossier::Solde,
+            ]),
             'bordereau' => $bordereau,
             'bordereaux' => $this->bordereauxDisponibles(),
             'typesDossiers' => $bordereau !== null
@@ -557,11 +562,11 @@ class DossierController extends Controller
             return back()->with('erreur', 'Seul un dossier au pôle Visa peut être transmis au pôle Solde.');
         }
 
+        // La référence de l'acte formaté n'est pas saisie au Visa : elle
+        // n'est donc ni validée ni enregistrée lors de la transmission.
         $donnees = $request->validate([
-            'reference_acte' => ['nullable', 'string', 'max:60'],
             'observation' => ['nullable', 'string', 'max:1000'],
         ], [], [
-            'reference_acte' => "référence de l'acte",
             'observation' => 'observation',
         ]);
 
@@ -571,7 +576,6 @@ class DossierController extends Controller
         $dossier->update([
             'pole' => PoleDossier::Solde,
             'passe_par_visa' => true,
-            'reference_acte' => ($donnees['reference_acte'] ?? null) ?: $dossier->reference_acte,
         ]);
 
         $observation = $donnees['observation'] ?? null;
@@ -901,6 +905,13 @@ class DossierController extends Controller
         unset($donnees['agent_im'], $donnees['agent_nom'], $donnees['agent_prenoms']);
 
         $donnees['pole'] = $donnees['pole'] ?? $this->poleDeLaDivision($bordereau->division_id)->value;
+
+        // Même si un ancien formulaire ou un appel direct envoie la valeur,
+        // un dossier au Visa ne stocke jamais de référence d'acte formaté.
+        if ($donnees['pole'] === PoleDossier::Visa->value) {
+            $donnees['reference_acte'] = null;
+        }
+
         $donnees['passe_par_visa'] = $request->boolean('passe_par_visa')
             || $donnees['pole'] === PoleDossier::Visa->value;
         $donnees['nombre_enfants'] = (int) ($donnees['nombre_enfants'] ?? 0);

@@ -5,6 +5,8 @@
     $agentChoisi = old('agent_id', $dossier->agent_id);
     $responsableChoisi = old('responsable_id', $dossier->responsable_id ?? Auth::id());
     $poleChoisi = old('pole', $dossier->pole?->value ?? 'solde');
+    // Le Visa ne utilise pas l'acte formaté : la référence de l'acte est une donnée du Solde.
+    $estVisa = $poleChoisi === \App\Enums\PoleDossier::Visa->value;
     $visaChoisi = (bool) old('passe_par_visa', $dossier->passe_par_visa ?? false);
     $rappelChoisi = (bool) old('avec_rappel', $dossier->avec_rappel ?? false);
     $nombreEnfantsChoisi = old('nombre_enfants', $dossier->nombre_enfants ?? 0);
@@ -291,14 +293,18 @@
 
                             <div class="sm:col-span-2">
                                 <div class="rounded-lg border border-gray-200 bg-white/80 p-4 shadow-sm">
-                                    <h4 class="text-sm font-semibold text-gray-700">Références du visa / de l'acte</h4>
-                                    <p class="mt-1 text-xs text-gray-400">À compléter si l'acte visé est connu (Visa ou Solde selon le circuit).</p>
+                                    <h4 class="text-sm font-semibold text-gray-700">{{ $estVisa ? 'Références du visa' : 'Références du visa / de l’acte' }}</h4>
+                                    <p class="mt-1 text-xs text-gray-400">
+                                        {{ $estVisa ? 'Le Visa ne produit pas d’acte formaté : seule la référence du visa est renseignée.' : 'À compléter si l’acte visé est connu.' }}
+                                    </p>
                                     <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                                        <div class="sm:col-span-2">
-                                            <x-input-label for="reference_acte" value="Référence de l'acte visé" />
-                                            <x-text-input id="reference_acte" name="reference_acte" type="text" class="mt-1 block w-full" :value="$referenceActeChoisie" />
-                                            <x-input-error class="mt-2" :messages="$errors->get('reference_acte')" />
-                                        </div>
+                                        @if (! $estVisa)
+                                            <div class="sm:col-span-2">
+                                                <x-input-label for="reference_acte" value="Référence de l'acte visé" />
+                                                <x-text-input id="reference_acte" name="reference_acte" type="text" class="mt-1 block w-full" :value="$referenceActeChoisie" />
+                                                <x-input-error class="mt-2" :messages="$errors->get('reference_acte')" />
+                                            </div>
+                                        @endif
                                         <div>
                                             <x-input-label for="date_acte" value="Date de l'acte visé" />
                                             <x-text-input id="date_acte" name="date_acte" type="date" class="mt-1 block w-full" :value="$dateActeChoisie" />

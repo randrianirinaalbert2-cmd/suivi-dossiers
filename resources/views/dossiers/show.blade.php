@@ -325,10 +325,15 @@
                         @endif
                     </dl>
                     <div class="mt-4 border-t border-gray-100 pt-4">
-                        <dt class="text-xs font-semibold uppercase text-gray-500">Références visa / acte visé</dt>
+                        <dt class="text-xs font-semibold uppercase text-gray-500">
+                            {{ $dossier->pole === \App\Enums\PoleDossier::Visa ? 'Références visa' : 'Références visa / acte visé' }}
+                        </dt>
                         <dd class="mt-1 text-gray-900">
                             <div class="flex flex-wrap gap-x-6 gap-y-1 text-sm">
-                                <span><span class="text-gray-500">Réf. acte :</span> {{ $dossier->reference_acte ?: '—' }}</span>
+                                {{-- La référence de l'acte est une donnée du pôle Solde : le Visa ne produit pas d'acte formaté. --}}
+                                @if ($dossier->pole !== \App\Enums\PoleDossier::Visa)
+                                    <span><span class="text-gray-500">Réf. acte :</span> {{ $dossier->reference_acte ?: '—' }}</span>
+                                @endif
                                 <span><span class="text-gray-500">Date acte :</span> {{ $dossier->date_acte?->format('d/m/Y') ?: '—' }}</span>
                                 <span><span class="text-gray-500">N° visa :</span> {{ $dossier->num_visa ?: '—' }}</span>
                                 <span><span class="text-gray-500">Date visa :</span> {{ $dossier->date_visa?->format('d/m/Y') ?: '—' }}</span>
@@ -551,7 +556,7 @@
                         visez-le pour le transmettre au pôle <strong>Solde</strong> (mandatement).
                     </p>
 
-                    <form method="POST" action="{{ route('dossiers.transmettre-solde', $dossier) }}" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <form method="POST" action="{{ route('dossiers.transmettre-solde', $dossier) }}" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                         @csrf
                         <div>
                             <x-input-label for="num_visa_affiche" value="N° de visa (enregistré)" />
@@ -571,19 +576,13 @@
                             </div>
                             <p class="mt-1 text-xs text-gray-500">Date à laquelle le numéro a été attribué.</p>
                         </div>
-                        <div>
-                            <x-input-label for="reference_acte" value="Référence de l'acte" />
-                            <x-text-input id="reference_acte" name="reference_acte" type="text" class="mt-1 block w-full"
-                                          :value="old('reference_acte', $dossier->reference_acte)" />
-                            <x-input-error class="mt-2" :messages="$errors->get('reference_acte')" />
-                        </div>
-                        <div class="sm:col-span-3">
+                        <div class="sm:col-span-2">
                             <x-input-label for="observation_visa" value="Observation (facultative)" />
                             <textarea id="observation_visa" name="observation" rows="2"
                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></textarea>
                             <x-input-error class="mt-2" :messages="$errors->get('observation')" />
                         </div>
-                        <div class="sm:col-span-3">
+                        <div class="sm:col-span-2">
                             <button type="submit"
                                     class="inline-flex items-center gap-2 rounded-md border border-transparent bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">

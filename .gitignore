@@ -28,6 +28,10 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 
+# Secrets de déploiement : jamais versionnés
+/deploy/comptes.json
+/deploy/*.secret
+
 # Scripts locaux et fichiers temporaires de développement
 /_tmp_*.php
 /check_users.php

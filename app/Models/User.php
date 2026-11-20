@@ -259,7 +259,17 @@ class User extends Authenticatable implements MustVerifyEmailContract
      */
     public function urlPhoto(): ?string
     {
-        return $this->photo ? Storage::disk('public')->url($this->photo) : null;
+        if (! $this->photo) {
+            return null;
+        }
+
+        // Sur Render, le bucket est privé : on sert la photo par une route
+        // authentifiée plutôt que par une URL publique signée ou accessible.
+        if (config('app.uploads_disk') === 's3') {
+            return route('photos.afficher', $this);
+        }
+
+        return Storage::disk('public')->url($this->photo);
     }
 
     /**

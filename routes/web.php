@@ -9,6 +9,7 @@ use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\DocumentNumeriseController;
 use App\Http\Controllers\DossierController;
 use App\Http\Controllers\LieuController;
+use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\PieceRequiseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceOrigineController;
@@ -24,6 +25,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 })->name('accueil');
+
+// Endpoint de santé utilisé par Render : aucune donnée n'est exposée.
+Route::get('/health', fn () => response('OK', 200)->header('Content-Type', 'text/plain'))
+    ->name('health');
 
 // Pas de « verified » : application interne, les comptes sont créés par
 // l'administration et aucune boîte de courriel n'est configurée.
@@ -99,6 +104,11 @@ Route::middleware(['auth'])->group(function () {
         ->name('documents.telecharger');
     Route::delete('documents/{document}', [DocumentNumeriseController::class, 'supprimer'])
         ->name('documents.destroy');
+
+    // Photos de profil : servies par l'application, jamais par une URL
+    // publique du bucket (les documents suivent déjà ce modèle).
+    Route::get('photos/{user}/afficher', [PhotoController::class, 'afficher'])
+        ->name('photos.afficher');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

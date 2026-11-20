@@ -1,5 +1,25 @@
 <?php
 
+/*
+ * Les pièces jointes et les photos de profil sont des données privées.
+ * En local, elles restent dans storage/app/public (disque « public »).
+ * Sur Render, UPLOADS_DISK=s3 fait pointer ce même disque vers le bucket
+ * Neon Object Storage : le code applicatif ne change pas de nom de disque.
+ */
+$disqueS3 = [
+    'driver' => 's3',
+    'key' => env('AWS_ACCESS_KEY_ID'),
+    'secret' => env('AWS_SECRET_ACCESS_KEY'),
+    'region' => env('AWS_REGION') ?: env('AWS_DEFAULT_REGION', 'us-east-1'),
+    'bucket' => env('AWS_BUCKET'),
+    'url' => env('AWS_URL'),
+    'endpoint' => env('AWS_ENDPOINT_URL_S3') ?: env('AWS_ENDPOINT'),
+    'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
+    'visibility' => 'private',
+    'throw' => true,
+    'report' => false,
+];
+
 return [
 
     /*
@@ -38,7 +58,7 @@ return [
             'report' => false,
         ],
 
-        'public' => [
+        'public' => env('UPLOADS_DISK') === 's3' ? $disqueS3 : [
             'driver' => 'local',
             'root' => storage_path('app/public'),
             'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
@@ -47,18 +67,7 @@ return [
             'report' => false,
         ],
 
-        's3' => [
-            'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'throw' => false,
-            'report' => false,
-        ],
+        's3' => $disqueS3,
 
     ],
 

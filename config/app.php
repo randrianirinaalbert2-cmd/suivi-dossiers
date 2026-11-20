@@ -54,6 +54,14 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    // Force HTTPS pour toutes les URL générées (Render termine le TLS).
+    'force_https' => env('FORCE_HTTPS', false),
+
+    // Disque utilisé pour les pièces jointes et les photos de profil.
+    // « local » conserve le comportement actuel, « s3 » utilise Neon
+    // Object Storage et servi les fichiers via des routes authentifiées.
+    'uploads_disk' => env('UPLOADS_DISK', 'local'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

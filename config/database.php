@@ -86,7 +86,9 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'url' => env('DB_URL'),
+            // Render fournit DATABASE_URL ; les déploiements historiques
+            // utilisaient DB_URL. Les deux sont acceptés.
+            'url' => env('DB_URL') ?: env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'laravel'),
@@ -97,6 +99,24 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+        ],
+
+        // Connexion de destination utilisée uniquement par la commande de
+        // copie locale MySQL -> Neon. Elle est séparée de `pgsql` pour que
+        // la base locale reste joignable pendant la migration.
+        'neon' => [
+            'driver' => 'pgsql',
+            'url' => env('NEON_DATABASE_URL'),
+            'host' => env('NEON_DB_HOST', '127.0.0.1'),
+            'port' => env('NEON_DB_PORT', '5432'),
+            'database' => env('NEON_DB_DATABASE', 'neondb'),
+            'username' => env('NEON_DB_USERNAME', 'neon'),
+            'password' => env('NEON_DB_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => env('NEON_DB_SSLMODE', 'require'),
         ],
 
         'sqlsrv' => [

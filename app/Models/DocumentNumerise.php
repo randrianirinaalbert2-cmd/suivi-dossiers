@@ -52,6 +52,10 @@ class DocumentNumerise extends ModeleBase
 
     public function url(): string
     {
+        if (config('app.uploads_disk') === 's3') {
+            return route('documents.telecharger', $this);
+        }
+
         return Storage::disk('public')->url($this->chemin_fichier);
     }
 

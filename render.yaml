@@ -27,11 +27,11 @@ services:
       - key: FORCE_HTTPS
         value: true
       - key: APP_LOCALE
-        value: en
+        value: fr
       - key: APP_FALLBACK_LOCALE
-        value: en
+        value: fr
       - key: APP_FAKER_LOCALE
-        value: en_US
+        value: fr_FR
       - key: BCRYPT_ROUNDS
         value: 12
       - key: LOG_CHANNEL

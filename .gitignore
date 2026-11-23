@@ -30,6 +30,7 @@ Thumbs.db
 
 # Secrets de déploiement : jamais versionnés
 /deploy/comptes.json
+/deploy/IDENTIFIANTS.txt
 /deploy/*.secret
 
 # Scripts locaux et fichiers temporaires de développement

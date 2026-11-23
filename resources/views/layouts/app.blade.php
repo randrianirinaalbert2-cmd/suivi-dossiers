@@ -28,27 +28,32 @@
             })();
         </script>
     </head>
-    <body class="font-sans antialiased">
+    <body class="mode-pc font-sans antialiased">
         <div class="min-h-screen fond-page" x-data="{ menuOuvert: window.innerWidth >= 1024 }">
             @include('layouts.navigation')
 
             <div class="zone-contenu min-w-0 w-full pt-14 transition-[padding-inline-start] duration-200 ease-out" :class="menuOuvert ? 'lg:ps-64' : 'lg:ps-0'">
-                <!-- Page Heading -->
-                @isset($header)
-                    <header class="entete-page no-print bg-[linear-gradient(90deg,#ffffff_0%,#eef2ff_55%,#faf5ff_100%)] border-b border-indigo-100 shadow-sm">
-                        <div class="mx-auto py-6 px-4 sm:px-6 lg:px-8 transition-all duration-200" :class="menuOuvert ? 'max-w-7xl' : 'max-w-full'">
-                            {{ $header }}
-                        </div>
-                        <div class="bande-soulignement h-1"></div>
-                    </header>
-                @endisset
+                {{-- Sur téléphone : même disposition que sur PC, avec défilement horizontal au doigt. --}}
+                <div class="mode-pc-defilement">
+                    <div class="mode-pc-largeur">
+                        <!-- Page Heading -->
+                        @isset($header)
+                            <header class="entete-page no-print bg-[linear-gradient(90deg,#ffffff_0%,#eef2ff_55%,#faf5ff_100%)] border-b border-indigo-100 shadow-sm">
+                                <div class="mx-auto py-6 px-4 sm:px-6 lg:px-8 transition-all duration-200" :class="menuOuvert ? 'max-w-7xl' : 'max-w-full'">
+                                    {{ $header }}
+                                </div>
+                                <div class="bande-soulignement h-1"></div>
+                            </header>
+                        @endisset
 
-                @include('partials.flash')
+                        @include('partials.flash')
 
-                <!-- Page Content -->
-                <main>
-                    {{ $slot }}
-                </main>
+                        <!-- Page Content -->
+                        <main>
+                            {{ $slot }}
+                        </main>
+                    </div>
+                </div>
             </div>
         </div>
 

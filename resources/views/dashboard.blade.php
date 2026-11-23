@@ -27,8 +27,8 @@
         </div>
     </x-slot>
 
-    <div class="py-4 sm:py-8" style="overflow-x: auto;">
-        <div class="mx-auto sm:px-6 lg:px-8 space-y-6" style="min-width: 1180px;">
+    <div class="py-8 space-y-6">
+        <div class="mx-auto sm:px-6 lg:px-8 space-y-6 transition-all duration-200" :class="menuOuvert ? 'max-w-7xl' : 'max-w-full'">
             @if(isset($dossiersTraitesAujourdhui) && $dossiersTraitesAujourdhui > 0)
                 <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 flex items-center justify-between shadow-sm">
                     <div class="flex items-center gap-2 text-sm text-emerald-800">
@@ -40,7 +40,11 @@
                 </div>
             @endif
             {{-- Cartes de synthèse --}}
-            <div class="grid gap-4" style="grid-template-columns: repeat({{ $voitVisa ? 5 : 4 }}, minmax(0, 1fr));">
+            <div @class([
+                'grid grid-cols-1 gap-4 sm:grid-cols-2',
+                'lg:grid-cols-5' => $voitVisa,
+                'lg:grid-cols-4' => ! $voitVisa,
+            ])>
                 <div class="rounded-xl border border-indigo-100 bg-[linear-gradient(135deg,#eef2ff_0%,#ffffff_75%)] p-5 shadow-sm shadow-indigo-950/5">
                     <div class="flex items-start justify-between gap-3">
                         <div>
@@ -134,7 +138,7 @@
                 </div>
             @endif
 
-            <div class="gap-6" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 {{-- Répartition par statut --}}
                 <div class="bg-white shadow-sm sm:rounded-lg p-6">
                     <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-800 uppercase tracking-wide">
@@ -169,7 +173,7 @@
                 </div>
 
                 {{-- Derniers dossiers --}}
-                <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden" style="grid-column: span 2;">
+                <div class="bg-white shadow-sm sm:rounded-lg lg:col-span-2 overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                         <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-800 uppercase tracking-wide">
                         <svg class="h-4 w-4 shrink-0 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
@@ -218,7 +222,7 @@
                 </div>
             </div>
 
-            <div class="gap-6" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {{-- Derniers bordereaux reçus --}}
                 <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">

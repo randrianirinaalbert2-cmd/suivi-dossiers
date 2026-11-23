@@ -3,6 +3,18 @@
 use Illuminate\Support\Str;
 use Pdo\Mysql;
 
+// Render conserve parfois l'ancienne URL « pooler » de Neon même après
+// désactivation du pooling. On la convertit ici en connexion directe.
+$urlPgSql = env('DB_URL') ?: env('DATABASE_URL');
+if (is_string($urlPgSql) && str_contains($urlPgSql, '-pooler.')) {
+    $urlPgSql = preg_replace('#@([^/@]+)-pooler\.#i', '@$1.', $urlPgSql);
+}
+
+$urlNeon = env('NEON_DATABASE_URL');
+if (is_string($urlNeon) && str_contains($urlNeon, '-pooler.')) {
+    $urlNeon = preg_replace('#@([^/@]+)-pooler\.#i', '@$1.', $urlNeon);
+}
+
 return [
 
     /*
@@ -87,8 +99,9 @@ return [
         'pgsql' => [
             'driver' => 'pgsql',
             // Render fournit DATABASE_URL ; les déploiements historiques
-            // utilisaient DB_URL. Les deux sont acceptés.
-            'url' => env('DB_URL') ?: env('DATABASE_URL'),
+            // utilisaient DB_URL. Les deux sont acceptés et normalisés
+            // ci-dessus pour utiliser la connexion directe Neon.
+            'url' => $urlPgSql,
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'laravel'),
@@ -106,7 +119,7 @@ return [
         // la base locale reste joignable pendant la migration.
         'neon' => [
             'driver' => 'pgsql',
-            'url' => env('NEON_DATABASE_URL'),
+            'url' => $urlNeon,
             'host' => env('NEON_DB_HOST', '127.0.0.1'),
             'port' => env('NEON_DB_PORT', '5432'),
             'database' => env('NEON_DB_DATABASE', 'neondb'),
